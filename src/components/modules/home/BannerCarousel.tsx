@@ -127,12 +127,6 @@ export const BannerCarousel = () => {
           </svg>
         </button>
       </div>
-
-      {/* Slide Progress Line */}
-      <div
-        className="absolute bottom-0 left-0 h-1 bg-[#B17169] transition-all duration-[6000ms] ease-linear z-40"
-        style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
-      />
     </section>
   );
 };

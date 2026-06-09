@@ -7,11 +7,11 @@ import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icon
 import { storeCategories } from "@/data/categories";
 import {
   bottomNavigation,
-  cartItemCount,
   mobileNavigationGroups,
   trendingSearches,
   utilityNavigation,
 } from "@/data/navigation";
+import { useCart } from "@/context/CartContext";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 
@@ -20,6 +20,7 @@ export const MobileNavigation = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const { cartCount, setIsCartOpen } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,12 +79,18 @@ export const MobileNavigation = () => {
         </Link>
 
         {/* Cart Icon Right */}
-        <Link href="#" className="relative text-black" aria-label="Open cart">
+        <button 
+          onClick={() => setIsCartOpen(true)}
+          className="relative text-black" 
+          aria-label="Open cart"
+        >
           <BsCart2 size={20} color="#000000" />
-          <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
-            {cartItemCount}
-          </span>
-        </Link>
+          {cartCount > 0 && (
+            <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+              {cartCount}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Sidebar Navigation - Always rendered with transition */}
@@ -251,9 +258,9 @@ export const MobileNavigation = () => {
             <>
               <div className="relative">
                 <Icon size={22} />
-                {item.name === "Cart" && (
+                {item.name === "Cart" && cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-[#B37068] text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">
-                    {cartItemCount}
+                    {cartCount}
                   </span>
                 )}
               </div>
@@ -275,14 +282,20 @@ export const MobileNavigation = () => {
           }
 
           return (
-            <Link
+            <button
               key={item.name}
-              href={item.href}
+              onClick={() => {
+                if (item.name === "Cart") {
+                  setIsCartOpen(true);
+                } else {
+                  router.push(item.href);
+                }
+              }}
               className="flex flex-col items-center gap-1 py-2 relative text-gray-700 hover:text-black transition-colors"
               aria-label={item.name === "Cart" ? "Open cart" : `Go to ${item.name}`}
             >
               {content}
-            </Link>
+            </button>
           );
         })}
       </div>

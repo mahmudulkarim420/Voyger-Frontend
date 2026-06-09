@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   FaChevronDown,
   FaEnvelope,
@@ -17,6 +18,7 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 import { IoBagOutline } from "react-icons/io5";
 import type { Product } from "@/types";
+import { useCart } from "@/context/CartContext";
 
 interface ProductDetailsProps {
   product: Product;
@@ -38,13 +40,15 @@ export default function ProductDetails({
   relatedProducts,
   similarProducts,
 }: ProductDetailsProps) {
+  const router = useRouter();
+  const { addToCart } = useCart();
   const sizes = product.sizes ?? ["M", "L", "XL"];
   const [selectedSize, setSelectedSize] = useState(sizes[0]);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [openAccordion, setOpenAccordion] = useState<string | null>("details");
   const activeProductImage = product.images[activeImage] ?? product.images[0];
-  
+
   // Use a placeholder base URL for social sharing
   const baseUrl = "https://voyage-fashion.com";
   const shareUrl = `${baseUrl}/product/${product.id}`;
@@ -90,7 +94,7 @@ export default function ProductDetails({
   };
 
   return (
-    <div className="bg-[#FCFAF6] min-h-screen">
+    <div className="w-full min-h-screen bg-[#FCFAF6]">
       <div className="container mx-auto px-4 lg:px-12 py-6 max-w-7xl">
         <nav className="text-[10px] text-gray-500 mb-6 flex items-center gap-2 tracking-tight">
           <Link href="/" className="hover:text-black transition-colors">
@@ -214,11 +218,20 @@ export default function ProductDetails({
             </div>
 
             <div className="flex flex-col gap-3 mb-10">
-              <button className="w-full bg-[#A05C55] hover:bg-[#8e524b] text-white py-[14px] rounded-[1px] flex items-center justify-center gap-3 font-bold tracking-[2px] text-xs transition-all uppercase shadow-sm">
+              <button
+                onClick={() => addToCart(product, selectedSize)}
+                className="w-full bg-[#A05C55] hover:bg-[#8e524b] text-white py-[14px] rounded-[1px] flex items-center justify-center gap-3 font-bold tracking-[2px] text-xs transition-all uppercase shadow-sm"
+              >
                 <IoBagOutline size={16} />
                 Add to Cart
               </button>
-              <button className="w-full bg-[#6C714D] hover:bg-[#606544] text-white py-[14px] rounded-[1px] font-bold tracking-[2px] text-xs transition-all uppercase shadow-sm">
+              <button
+                onClick={() => {
+                  addToCart(product, selectedSize);
+                  router.push("/checkout");
+                }}
+                className="w-full bg-[#6C714D] hover:bg-[#606544] text-white py-[14px] rounded-[1px] font-bold tracking-[2px] text-xs transition-all uppercase shadow-sm"
+              >
                 Buy It Now
               </button>
             </div>
@@ -298,11 +311,7 @@ export default function ProductDetails({
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                 {relatedProducts.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/product/${item.id}`}
-                    className="flex flex-col group"
-                  >
+                  <Link key={item.id} href={`/product/${item.id}`} className="flex flex-col group">
                     <div className="relative aspect-square overflow-hidden rounded-[2px] mb-6 shadow-sm bg-white">
                       <Image
                         src={item.images[0]}

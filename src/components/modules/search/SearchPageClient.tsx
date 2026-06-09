@@ -14,7 +14,7 @@ export default function SearchPageClient() {
     (product) =>
       product.name.toLowerCase().includes(query.toLowerCase()) ||
       product.category.toLowerCase().includes(query.toLowerCase()) ||
-      product.description.toLowerCase().includes(query.toLowerCase())
+      product.description.toLowerCase().includes(query.toLowerCase()),
   );
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
@@ -27,7 +27,7 @@ export default function SearchPageClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FCFAF6]">
+    <div className="w-full min-h-screen bg-[#FCFAF6]">
       <div className="border-b border-[#D5C1B6]/20 bg-[#FCFAF6] py-12">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex flex-col gap-8 max-w-4xl">
@@ -74,16 +74,13 @@ export default function SearchPageClient() {
         {filteredProducts.length > 0 ? (
           <div>
             <p className="text-[#6A5A4A] mb-12 italic font-light">
-              Found {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""} for &quot;
+              Found {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""} for
+              &quot;
               <span className="font-semibold text-[#3A322B] not-italic">{query}</span>&quot;
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
               {filteredProducts.map((product, idx) => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  priority={idx < 4}
-                />
+                <ProductCard key={product.id} product={product} priority={idx < 4} />
               ))}
             </div>
           </div>

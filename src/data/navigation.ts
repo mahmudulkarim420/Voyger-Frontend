@@ -73,11 +73,9 @@ export const bottomNavigation: NavigationItem[] = [
   { name: "Home", href: "/" },
   { name: "Search", href: "/search" },
   { name: "Cart", href: "#" },
-  { name: "Account", href: "#" },
+  { name: "Account", href: "/profile" },
   { name: "Call", href: "tel:+1234567890" },
 ];
-
-export const cartItemCount = 1;
 
 export const trendingSearches = [
   "Luxury Panjabi",

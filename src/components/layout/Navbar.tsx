@@ -4,14 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
+import { FiUser, FiSearch, FiChevronDown } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
-import { cartItemCount, desktopNavigationGroups } from "@/data/navigation";
+import { desktopNavigationGroups } from "@/data/navigation";
+import { useCart } from "@/context/CartContext";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const router = useRouter();
+  const { cartCount, setIsCartOpen } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,19 +65,10 @@ export const Navbar = () => {
               aria-label="Open shop categories"
             >
               <span className="text-[14px] tracking-widest font-medium text-gray-900">SHOP</span>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <FiChevronDown
                 className="group-hover:rotate-180 transition-transform duration-300 text-black"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
+                size={14}
+              />
             </button>
 
             {/* Dropdown Menu */}
@@ -122,44 +117,68 @@ export const Navbar = () => {
             className="bg-[#B37068] hover:bg-[#9c6059] active:bg-[#8b5249] transition-colors px-6 rounded-r-md flex items-center justify-center border border-[#B37068] cursor-pointer"
             aria-label="Search products"
           >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
+            <FiSearch size={18} color="white" strokeWidth={2} />
           </button>
         </form>
 
         {/* Right Section: Icons */}
         <div className="flex items-center gap-6">
-          <button className="hover:opacity-70 transition-opacity" aria-label="Open account menu">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="black"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          <div className="relative group">
+            <button
+              onClick={() => setShowAccountMenu(!showAccountMenu)}
+              className="hover:opacity-70 transition-opacity p-2"
+              aria-label="Open account menu"
             >
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </button>
-          <button className="relative hover:opacity-70 transition-opacity" aria-label="Open cart">
-            <BsCart2 className="text-black" />
-            <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[10px] font-medium w-4 h-4 flex items-center justify-center rounded-full">
-              {cartItemCount}
-            </span>
+              <FiUser size={24} className="text-black" strokeWidth={1.5} />
+            </button>
+
+            {/* Account Dropdown Menu */}
+            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 py-2">
+              <Link
+                href="/login"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/register"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Create Account
+              </Link>
+              <Link
+                href="/profile"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Profile
+              </Link>
+              <Link
+                href="/orders"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Orders
+              </Link>
+              <hr className="my-2" />
+              <button
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                onClick={() => router.push("/dashboard")}
+              >
+                Dashboard
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="relative hover:opacity-70 transition-opacity p-2"
+            aria-label="Open cart"
+          >
+            <BsCart2 className="text-black" size={24} />
+            {cartCount > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[10px] font-medium w-4 h-4 flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
