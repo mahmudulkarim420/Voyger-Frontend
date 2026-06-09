@@ -1,0 +1,222 @@
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FiSearch, FiX } from "react-icons/fi";
+import { storeCategories } from "@/data/categories";
+import { products } from "@/data/products";
+import { Product } from "@/types";
+import Image from "next/image";
+import Link from "next/link";
+
+export const ProductFilters = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [mounted, setMounted] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Sync state with URL initially
+  useEffect(() => {
+    setMounted(true);
+    setSearch(searchParams.get("search") || "");
+    setCategory(searchParams.get("category") || "all");
+    setSort(searchParams.get("sort") || "newest");
+  }, [searchParams]);
+
+  // Handle outside click to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Update suggestions when search changes
+  useEffect(() => {
+    if (search.trim().length > 1) {
+      const query = search.toLowerCase();
+      const filtered = products
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
+        )
+        .slice(0, 5); // Limit to top 5 suggestions
+      setSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [search]);
+
+  // Debounced URL update for live search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const urlSearch = searchParams.get("search") || "";
+      if (search !== urlSearch) {
+        updateFilters({ search });
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const updateFilters = (updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    // We include current local search in params when updating other things
+    // unless search is explicitly being updated
+    if (!("search" in updates)) {
+      if (search) params.set("search", search);
+      else params.delete("search");
+    }
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value && value !== "all" && value !== "") {
+        params.set(key, value);
+      } else {
+        params.delete(key);
+      }
+    });
+
+    // Reset page when filters change
+    params.delete("page");
+
+    router.push(`/products?${params.toString()}`, { scroll: false });
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowSuggestions(false);
+    updateFilters({ search });
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setCategory("all");
+    setSort("newest");
+    router.push("/products", { scroll: false });
+  };
+
+  const hasActiveFilters = search || category !== "all" || sort !== "newest";
+
+  return (
+    <div
+      className={`bg-white border-2 border-[#B37068]/5 rounded-2xl p-6 shadow-sm mb-10 transition-opacity duration-300 ${mounted ? "opacity-100" : "opacity-50"}`}
+    >
+      <div className="flex flex-col lg:flex-row gap-6 items-center">
+        {/* Search Bar Section */}
+        <div className="w-full lg:flex-1 relative" ref={dropdownRef}>
+          <label
+            htmlFor="product-search"
+            className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 ml-1"
+          >
+            Search Products
+          </label>
+          <form onSubmit={handleSearchSubmit} className="relative flex">
+            <div className="relative flex-1">
+              <input
+                id="product-search"
+                type="text"
+                autoComplete="off"
+                placeholder="What are you looking for?"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() =>
+                  search.trim().length > 1 && suggestions.length > 0 && setShowSuggestions(true)
+                }
+                className="w-full border border-gray-200 rounded-l-xl px-5 py-3 pl-12 text-sm focus:ring-2 focus:ring-[#B37068]/10 focus:border-[#B37068] outline-none transition-all"
+              />
+              <FiSearch
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
+
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch("");
+                    setShowSuggestions(false);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <FiX size={14} />
+                </button>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="bg-[#B37068] hover:bg-[#9c6059] text-white px-6 py-3 rounded-r-xl text-sm font-medium transition-colors"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+
+        {/* Filters Section */}
+        <div className="w-full lg:w-auto flex flex-wrap items-end gap-4">
+          <div className="flex-1 lg:flex-none min-w-[160px]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 ml-1">
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCategory(val);
+                updateFilters({ category: val });
+              }}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#B37068]/10 focus:border-[#B37068] outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207L10%2012L15%207%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px] bg-[right_12_center] bg-no-repeat"
+            >
+              <option value="all">All Categories</option>
+              {storeCategories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex-1 lg:flex-none min-w-[160px]">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 ml-1">
+              Sort By
+            </label>
+            <select
+              value={sort}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSort(val);
+                updateFilters({ sort: val });
+              }}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#B37068]/10 focus:border-[#B37068] outline-none cursor-pointer appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M5%207L10%2012L15%207%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:20px] bg-[right_12_center] bg-no-repeat"
+            >
+              <option value="newest">Newest Arrivals</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="name-asc">Name: A-Z</option>
+            </select>
+          </div>
+
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#B37068] px-2 py-3 transition-colors"
+            >
+              <FiX size={16} />
+              <span>Clear</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

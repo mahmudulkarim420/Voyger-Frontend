@@ -10,6 +10,45 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-baskervville), serif;
   --font-serif: var(--font-baskervville), serif;
+
+  /* Custom Spacing & Layout Tokens */
+  --spacing-section-y: calc(var(--spacing) * 4);
+  --spacing-section-y-md: calc(var(--spacing) * 6);
+
+  /* Container Padding */
+  --spacing-container-x: calc(var(--spacing) * 4);
+  --spacing-container-x-sm: calc(var(--spacing) * 6);
+  --spacing-container-x-lg: calc(var(--spacing) * 8);
+}
+
+@layer components {
+  .section-padding {
+    @apply py-4 md:py-6;
+  }
+
+  .container-standard {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .heading-hero {
+    @apply text-3xl md:text-5xl font-bold tracking-tight text-[#2F2923];
+  }
+
+  .heading-section {
+    @apply text-2xl md:text-3xl font-semibold tracking-wide text-[#6A5A4A];
+  }
+
+  .text-product-name {
+    @apply text-base font-medium text-[#2F2923];
+  }
+
+  .text-product-price {
+    @apply text-sm font-semibold text-[#2F2923];
+  }
+
+  .text-card-detail {
+    @apply text-xs font-semibold uppercase tracking-[0.18em];
+  }
 }
 
 @media (prefers-color-scheme: dark) {

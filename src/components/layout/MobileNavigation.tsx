@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icons/bs";
@@ -12,6 +12,9 @@ import {
   utilityNavigation,
 } from "@/data/navigation";
 import { useCart } from "@/context/CartContext";
+import { products } from "@/data/products";
+import { Product } from "@/types";
+import Image from "next/image";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 
@@ -19,8 +22,25 @@ export const MobileNavigation = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
   const router = useRouter();
   const { cartCount, setIsCartOpen } = useCart();
+
+  // Update suggestions as user types
+  useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      const query = searchQuery.toLowerCase();
+      const filtered = products
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
+        )
+        .slice(0, 6);
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,9 +99,9 @@ export const MobileNavigation = () => {
         </Link>
 
         {/* Cart Icon Right */}
-        <button 
+        <button
           onClick={() => setIsCartOpen(true)}
-          className="relative text-black" 
+          className="relative text-black"
           aria-label="Open cart"
         >
           <BsCart2 size={20} color="#000000" />
@@ -125,81 +145,81 @@ export const MobileNavigation = () => {
                   : null;
 
                 return (
-                <div key={category.name} className="border-b border-gray-100/50 py-4">
-                  <div
-                    className="flex items-center justify-between cursor-pointer group"
-                    onClick={() =>
-                      category.children &&
-                      setActiveCategory(activeCategory === category.name ? null : category.name)
-                    }
-                  >
-                    <Link
-                      href={category.href}
-                      className="text-[14px] font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#B37068] transition-colors"
-                      aria-label={`Browse ${categoryDetails?.name ?? category.name}`}
-                      onClick={(e) => {
-                        if (category.children) {
-                          e.preventDefault(); // Don't navigate if there are subcategories, toggle them instead
-                        } else {
-                          setMenuOpen(false);
-                        }
-                      }}
+                  <div key={category.name} className="border-b border-gray-100/50 py-4">
+                    <div
+                      className="flex items-center justify-between cursor-pointer group"
+                      onClick={() =>
+                        category.children &&
+                        setActiveCategory(activeCategory === category.name ? null : category.name)
+                      }
                     >
-                      {category.name}
-                    </Link>
+                      <Link
+                        href={category.href}
+                        className="text-[14px] font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#B37068] transition-colors"
+                        aria-label={`Browse ${categoryDetails?.name ?? category.name}`}
+                        onClick={(e) => {
+                          if (category.children) {
+                            e.preventDefault(); // Don't navigate if there are subcategories, toggle them instead
+                          } else {
+                            setMenuOpen(false);
+                          }
+                        }}
+                      >
+                        {category.name}
+                      </Link>
+                      {category.children && (
+                        <div
+                          className={`p-1.5 rounded-full bg-gray-50 transition-all duration-300 ${activeCategory === category.name ? "rotate-180 bg-[#F4EBE4] text-[#B37068]" : "text-gray-400"}`}
+                        >
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                          >
+                            <path d="m6 9 6 6 6-6" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Subcategories Accordion */}
                     {category.children && (
                       <div
-                        className={`p-1.5 rounded-full bg-gray-50 transition-all duration-300 ${activeCategory === category.name ? "rotate-180 bg-[#F4EBE4] text-[#B37068]" : "text-gray-400"}`}
+                        className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                          activeCategory === category.name
+                            ? "max-h-[500px] mt-2 opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
                       >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                        >
-                          <path d="m6 9 6 6 6-6" />
-                        </svg>
+                        <div className="flex flex-col gap-1 py-2">
+                          {category.children.map((sub) => (
+                            <Link
+                              key={sub.name}
+                              href={sub.href}
+                              className="text-[14px] text-gray-600 hover:text-black py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-between group/sub"
+                              onClick={() => setMenuOpen(false)}
+                            >
+                              <span>{sub.name}</span>
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="opacity-0 -translate-x-2 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all"
+                              >
+                                <path d="m9 18 6-6-6-6" />
+                              </svg>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  {/* Subcategories Accordion */}
-                  {category.children && (
-                    <div
-                      className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                        activeCategory === category.name
-                          ? "max-h-[500px] mt-2 opacity-100"
-                          : "max-h-0 opacity-0"
-                      }`}
-                    >
-                      <div className="flex flex-col gap-1 py-2">
-                        {category.children.map((sub) => (
-                          <Link
-                            key={sub.name}
-                            href={sub.href}
-                            className="text-[14px] text-gray-600 hover:text-black py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-between group/sub"
-                            onClick={() => setMenuOpen(false)}
-                          >
-                            <span>{sub.name}</span>
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              className="opacity-0 -translate-x-2 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all"
-                            >
-                              <path d="m9 18 6-6-6-6" />
-                            </svg>
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
                 );
               })}
             </div>
@@ -319,17 +339,18 @@ export const MobileNavigation = () => {
 
         {/* Search Panel - Sliding from top */}
         <div
-          className={`absolute top-0 left-0 right-0 bg-[#FCFAF6] shadow-2xl z-50 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${
+          className={`absolute top-0 left-0 right-0 bg-[#FCFAF6] shadow-2xl z-50 transition-all duration-500 cubic-bezier(0.4, 0, 0.2, 1) flex flex-col max-h-[90vh] ${
             searchOpen ? "translate-y-0" : "-translate-y-full"
           }`}
         >
           {/* Search Bar Container */}
-          <div className="px-6 py-5">
+          <div className="px-6 py-5 border-b border-gray-100">
             <form onSubmit={handleSearch} className="flex items-center gap-4">
               <div className="flex-1 flex items-center gap-3 bg-gray-100 px-4 py-3 rounded-xl border border-transparent focus-within:border-[#B37068] transition-all">
                 <BsSearch size={18} className="text-gray-500" />
                 <input
                   type="text"
+                  autoComplete="off"
                   placeholder="What are you looking for?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -349,28 +370,76 @@ export const MobileNavigation = () => {
                 <BsX size={26} />
               </button>
             </form>
+          </div>
 
-            {/* Quick Links / Popular Searches */}
-            <div className="mt-8 mb-4">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-4 px-1">
-                Trending Now
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {trendingSearches.map((item) => (
+          <div className="flex-1 overflow-y-auto no-scrollbar pb-8">
+            {suggestions.length > 0 ? (
+              <div className="px-6 py-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-6 px-1">
+                  Products Found
+                </p>
+                <div className="space-y-4">
+                  {suggestions.map((product) => (
+                    <Link
+                      key={product.id}
+                      href={`/product/${product.id}`}
+                      className="flex items-center gap-4 bg-white p-3 rounded-2xl border border-gray-100 shadow-sm active:scale-[0.98] transition-all"
+                      onClick={() => {
+                        setSearchOpen(false);
+                        setSearchQuery("");
+                      }}
+                    >
+                      <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                        <Image
+                          src={product.images[0]}
+                          alt={product.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-[14px] font-bold text-gray-900 truncate mb-0.5">
+                          {product.name}
+                        </h4>
+                        <p className="text-[12px] text-gray-500 capitalize">
+                          {product.category.replace("-", " ")}
+                        </p>
+                        <div className="mt-1 text-[13px] font-bold text-[#B37068]">
+                          ৳{product.price}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                   <button
-                    key={item}
-                    onClick={() => {
-                      setSearchQuery(item);
-                      router.push(`/search?q=${encodeURIComponent(item)}`);
-                      setSearchOpen(false);
-                    }}
-                    className="px-4 py-2 bg-white border border-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:border-[#B37068] hover:text-[#B37068] transition-all shadow-sm"
+                    onClick={handleSearch}
+                    className="w-full py-4 bg-gray-900 text-white rounded-xl text-sm font-bold tracking-widest uppercase mt-4 active:scale-[0.98] transition-all"
                   >
-                    {item}
+                    View All Results
                   </button>
-                ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="px-6 py-8">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-6 px-1">
+                  Trending Now
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {trendingSearches.map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        setSearchQuery(item);
+                        router.push(`/search?q=${encodeURIComponent(item)}`);
+                        setSearchOpen(false);
+                      }}
+                      className="px-4 py-2.5 bg-white border border-gray-100 text-gray-700 rounded-xl text-sm font-bold hover:border-[#B37068] hover:text-[#B37068] transition-all shadow-sm active:scale-95"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

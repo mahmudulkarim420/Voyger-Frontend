@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IoCloseOutline, IoTrashOutline, IoBagOutline } from "react-icons/io5";
@@ -26,7 +26,10 @@ export const CartDrawer = () => {
     cartTotal,
     cartCount,
   } = useCart();
-  const [isClosing, setIsClosing] = React.useState(false);
+
+  const [isClosing, setIsClosing] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState<"view-cart" | "checkout" | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   if (!isCartOpen && !isClosing) return null;
 
@@ -38,8 +41,27 @@ export const CartDrawer = () => {
     }, 600);
   };
 
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
+      {/* Keyframe Injector */}
+      <style>{`
+        @keyframes spreadFill {
+          from {
+            clip-path: circle(0% at var(--mouse-x, 50%) var(--mouse-y, 50%));
+          }
+          to {
+            clip-path: circle(150% at var(--mouse-x, 50%) var(--mouse-y, 50%));
+          }
+        }
+      `}</style>
+
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] ${
@@ -58,7 +80,7 @@ export const CartDrawer = () => {
         <div className="bg-[#A05C55] px-6 py-5 flex items-center justify-between text-white shadow-sm">
           <div className="flex items-center gap-3">
             <h2 className="text-sm font-bold tracking-[0.2em] uppercase">Your Cart</h2>
-            <div className="bg-white text-[#A05C55] w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">
+            <div className="bg-white text-[#A05C55] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold font-sans">
               {cartCount}
             </div>
           </div>
@@ -89,7 +111,7 @@ export const CartDrawer = () => {
                   {/* Product Details */}
                   <div className="flex-1 flex flex-col justify-between py-1">
                     <div>
-                      <h3 className="text-[13px] font-medium text-[#3A322B] leading-snug mb-1">
+                      <h3 className="text-sm font-medium text-[#3A322B] leading-snug mb-1">
                         {item.name} {item.selectedSize ? `- ${item.selectedSize}` : ""}
                       </h3>
                       <p className="text-sm font-bold text-[#3A322B]">{formatPrice(item.price)}</p>
@@ -107,7 +129,7 @@ export const CartDrawer = () => {
                         >
                           <AiOutlineMinus size={10} />
                         </button>
-                        <span className="w-8 h-8 flex items-center justify-center text-[11px] font-bold text-[#3A322B]">
+                        <span className="w-8 h-8 flex items-center justify-center text-xs font-bold text-[#3A322B]">
                           {item.quantity}
                         </span>
                         <button
@@ -142,7 +164,7 @@ export const CartDrawer = () => {
               <p className="text-[#6A5A4A] italic font-light mb-8">Your cart is currently empty.</p>
               <button
                 onClick={() => setIsCartOpen(false)}
-                className="bg-[#A05C55] text-white px-10 py-3 rounded-[1px] font-bold tracking-[2px] text-[10px] uppercase shadow-sm"
+                className="bg-[#A05C55] text-white px-10 py-3 rounded-[1px] font-bold tracking-[2px] text-xs uppercase shadow-sm"
               >
                 Continue Shopping
               </button>
@@ -161,22 +183,77 @@ export const CartDrawer = () => {
             </div>
 
             <div className="flex flex-col gap-3">
+              {/* View Cart Button */}
               <Link
                 href="/cart"
                 onClick={handleClose}
-                className="w-full py-4 border border-[#D5C1B6] text-[#A05C55] text-center font-bold tracking-[0.2em] text-[10px] uppercase hover:bg-[#A05C55] hover:text-white hover:border-[#A05C55] transition-all duration-300 rounded-[1px]"
+                onMouseEnter={() => setHoveredButton("view-cart")}
+                onMouseLeave={() => setHoveredButton(null)}
+                onMouseMove={handleMouseMove}
+                className="w-full py-4 text-center font-bold tracking-[0.2em] text-xs uppercase rounded-[1px] relative overflow-hidden group block"
               >
-                View Cart
+                <div
+                  className={`absolute inset-0 border transition-all duration-300 ${hoveredButton === "view-cart" ? "border-[#A05C55]" : "border-[#D5C1B6]"}`}
+                />
+                {hoveredButton === "view-cart" && (
+                  <div
+                    className="absolute inset-0 bg-[#A05C55]"
+                    style={
+                      {
+                        "--mouse-x": `${mousePos.x}%`,
+                        "--mouse-y": `${mousePos.y}%`,
+                        animation: "spreadFill 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+                      } as React.CSSProperties
+                    }
+                  />
+                )}
+                <span
+                  className={`relative z-10 transition-colors duration-300 ${hoveredButton === "view-cart" ? "text-white" : "text-[#A05C55]"}`}
+                >
+                  View Cart
+                </span>
               </Link>
+
+              {/* Checkout Button */}
               <Link
                 href="/checkout"
                 onClick={handleClose}
-                className="w-full py-4 bg-[#A05C55] text-white text-center font-bold tracking-[0.2em] text-[10px] uppercase hover:bg-[#8e524b] transition-all duration-300 rounded-[1px] shadow-md"
+                onMouseEnter={() => setHoveredButton("checkout")}
+                onMouseLeave={() => setHoveredButton(null)}
+                onMouseMove={handleMouseMove}
+                className="w-full py-4 text-center font-bold tracking-[0.2em] text-xs uppercase rounded-[1px] relative overflow-hidden block"
               >
-                Checkout
+                {/* Background */}
+                <div className="absolute inset-0 bg-[#A05C55]" />
+
+                {/* Hover Fill */}
+                {hoveredButton === "checkout" && (
+                  <div
+                    className="absolute inset-0 bg-[#FCFAF6]"
+                    style={
+                      {
+                        "--mouse-x": `${mousePos.x}%`,
+                        "--mouse-y": `${mousePos.y}%`,
+                        animation: "spreadFill 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
+                      } as React.CSSProperties
+                    }
+                  />
+                )}
+
+                {/* Border - always on top */}
+                <div className="absolute inset-0 border border-[#A05C55] z-[5]" />
+
+                {/* Text */}
+                <span
+                  className={`relative z-10 transition-colors duration-300 ${
+                    hoveredButton === "checkout" ? "text-[#A05C55]" : "text-[#D5C1B6]"
+                  }`}
+                >
+                  Checkout
+                </span>
               </Link>
             </div>
-            <p className="mt-6 text-center text-[10px] text-gray-400 italic">
+            <p className="mt-6 text-center text-xs text-gray-400 italic">
               Shipping, taxes, and discount codes calculated at checkout
             </p>
           </div>

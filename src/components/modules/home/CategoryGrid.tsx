@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 
-
 const gridCategories = [
   {
     name: "Panjabi",
@@ -39,7 +38,7 @@ const gridCategories = [
 
 export const CategoryGrid = () => {
   return (
-    <section className="container mx-auto px-4 lg:px-8 py-8 bg-[#FCFAF6]">
+    <section className="container-standard section-padding bg-[#FCFAF6]">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         {gridCategories.map((item) => (
           <Link
@@ -47,14 +46,13 @@ export const CategoryGrid = () => {
             href={`/shop/${item.name.toLowerCase().replace(" ", "-")}`}
             className="group relative block overflow-hidden rounded-md aspect-[3/4] shadow-sm"
           >
-            
             <Image
-            src={item.image}
-            alt={item.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
+              src={item.image}
+              alt={item.name}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
             {/* Label overlay */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#FCFAF6] px-6 py-2 rounded shadow-sm border border-[#D5C1B6]/50">
               <span className="text-[14px] font-medium text-gray-900 whitespace-nowrap tracking-wide">

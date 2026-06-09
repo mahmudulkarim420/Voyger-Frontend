@@ -95,8 +95,8 @@ export default function ProductDetails({
 
   return (
     <div className="w-full min-h-screen bg-[#FCFAF6]">
-      <div className="container mx-auto px-4 lg:px-12 py-6 max-w-7xl">
-        <nav className="text-[10px] text-gray-500 mb-6 flex items-center gap-2 tracking-tight">
+      <div className="container-standard section-padding">
+        <nav className="text-xs text-gray-500 mb-6 flex items-center gap-2 tracking-tight">
           <Link href="/" className="hover:text-black transition-colors">
             Home
           </Link>
@@ -121,7 +121,7 @@ export default function ProductDetails({
                 </span>
               </div>
               <div className="absolute top-6 right-6 opacity-60">
-                <span className="text-white text-[8px] font-medium tracking-[2px] uppercase select-none">
+                <span className="text-white text-[9px] font-medium tracking-[2px] uppercase select-none">
                   divine couture
                 </span>
               </div>
@@ -170,7 +170,7 @@ export default function ProductDetails({
               <div className="flex items-center justify-between mb-4">
                 <span className="text-xs font-bold text-[#3A322B] tracking-wider">Size</span>
                 <button
-                  className="flex items-center gap-1.5 text-[10px] text-gray-800 hover:text-black transition-colors font-semibold"
+                  className="flex items-center gap-1.5 text-xs text-gray-800 hover:text-black transition-colors font-semibold"
                   aria-label="Open size guide"
                 >
                   <FaRulerCombined className="rotate-45" size={12} />
@@ -183,7 +183,7 @@ export default function ProductDetails({
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     aria-label={`Select size ${size}`}
-                    className={`w-9 h-8 flex items-center justify-center rounded-[1px] border text-[11px] font-bold transition-all ${
+                    className={`w-9 h-8 flex items-center justify-center rounded-[1px] border text-xs font-bold transition-all ${
                       selectedSize === size
                         ? "bg-black text-white border-black"
                         : "border-gray-300 text-[#3A322B] hover:border-black"
@@ -237,7 +237,7 @@ export default function ProductDetails({
             </div>
 
             <div className="flex items-center gap-4 mb-10">
-              <span className="text-[10px] text-gray-400 italic">Share:</span>
+              <span className="text-xs text-gray-400 italic">Share:</span>
               <div className="flex gap-4">
                 {shareLinks.map((item) => (
                   <a
@@ -276,7 +276,7 @@ export default function ProductDetails({
                     className="w-full py-4 flex items-center justify-between text-left group"
                     aria-expanded={openAccordion === section.id}
                   >
-                    <span className="text-[12px] font-medium text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide">
+                    <span className="text-sm font-medium text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide">
                       {section.title}
                     </span>
                     <FaChevronDown
@@ -293,7 +293,7 @@ export default function ProductDetails({
                         : "max-h-0 opacity-0"
                     }`}
                   >
-                    <p className="text-[11px] text-gray-600 leading-relaxed italic pr-4">
+                    <p className="text-xs text-gray-600 leading-relaxed italic pr-4">
                       {section.content}
                     </p>
                   </div>
@@ -306,9 +306,7 @@ export default function ProductDetails({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-16 border-t border-gray-100">
           {relatedProducts.length > 0 && (
             <div className="lg:col-span-9">
-              <h2 className="text-2xl lg:text-3xl font-serif text-[#3A322B] mb-10 tracking-widest font-light">
-                Related Products
-              </h2>
+              <h2 className="heading-section mb-10">Related Products</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                 {relatedProducts.map((item) => (
                   <Link key={item.id} href={`/product/${item.id}`} className="flex flex-col group">
@@ -322,15 +320,15 @@ export default function ProductDetails({
                       />
                     </div>
                     <div className="bg-[#F8F3EE] px-4 py-4 rounded-[1px] text-center border border-[#E9E1D8]/50">
-                      <h3 className="text-[11px] font-bold text-[#3A322B] mb-2 group-hover:text-[#A05C55] transition-colors tracking-wider uppercase">
+                      <h3 className="text-card-detail mb-2 group-hover:text-[#A05C55] transition-colors tracking-wider uppercase">
                         {item.name}
                       </h3>
                       <div className="flex items-center justify-center gap-3">
-                        <span className="text-[10px] font-bold text-[#3A322B]">
+                        <span className="text-sm font-bold text-[#3A322B]">
                           {formatPrice(item.price)}
                         </span>
                         {item.oldPrice && (
-                          <div className="relative text-[9px] text-gray-400 italic">
+                          <div className="relative text-xs text-gray-400 italic">
                             {formatPrice(item.oldPrice)}
                             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gray-300 -rotate-3" />
                           </div>
@@ -345,9 +343,7 @@ export default function ProductDetails({
 
           {similarProducts.length > 0 && (
             <div className="lg:col-span-3">
-              <h2 className="text-2xl lg:text-3xl font-serif text-[#3A322B] mb-10 tracking-widest font-light">
-                Similar Products
-              </h2>
+              <h2 className="heading-section mb-10">Similar Products</h2>
               <div className="flex flex-col gap-6">
                 {similarProducts.map((item) => (
                   <Link
@@ -365,15 +361,15 @@ export default function ProductDetails({
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <h3 className="text-[10px] font-bold text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide uppercase">
+                      <h3 className="text-xs font-bold text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide uppercase">
                         {item.name}
                       </h3>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-[#3A322B]">
+                        <span className="text-xs font-bold text-[#3A322B]">
                           {formatPrice(item.price)}
                         </span>
                         {item.oldPrice && (
-                          <div className="relative text-[9px] text-gray-400 italic">
+                          <div className="relative text-xs text-gray-400 italic">
                             {formatPrice(item.oldPrice)}
                             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gray-300 -rotate-3" />
                           </div>

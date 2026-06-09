@@ -2,9 +2,8 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { IoBagOutline, IoHelpCircleOutline } from "react-icons/io5";
+import { IoHelpCircleOutline } from "react-icons/io5";
 import { FaChevronDown } from "react-icons/fa";
 
 const formatPrice = (price: number) =>
@@ -67,7 +66,6 @@ export default function CheckoutPage() {
                     Country/Region
                   </label>
                   <select className="w-full bg-white border border-gray-300 text-gray-900 rounded-md px-4 pt-6 pb-2 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] appearance-none font-medium">
-                    <option>Bangladesh</option>
                     <option>Bangladesh</option>
                   </select>
                   <FaChevronDown

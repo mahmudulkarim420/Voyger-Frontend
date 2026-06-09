@@ -13,7 +13,7 @@ import { NewArrivalCarousel } from "@/components/modules/home/NewArrivalCarousel
 
 export default function Home() {
   return (
-    <div className="w-full flex flex-col pb-20 bg-[#FCFAF6]">
+    <div className="w-full flex flex-col bg-[#FCFAF6]">
       {/* Banner & Categories Group */}
       <div>
         <BannerCarousel />

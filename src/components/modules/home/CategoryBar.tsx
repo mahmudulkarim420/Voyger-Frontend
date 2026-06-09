@@ -23,7 +23,7 @@ export const CategoryBar = () => {
   };
 
   return (
-    <section className="w-full bg-[#FCFAF6] py-8 md:py-12">
+    <section className="w-full bg-[#FCFAF6] section-padding">
       <style>{`
         @keyframes spreadFill {
           from {
@@ -34,7 +34,7 @@ export const CategoryBar = () => {
           }
         }
       `}</style>
-      <div className="container mx-auto px-4 lg:px-8">
+      <div className="container-standard">
         <div className="flex flex-nowrap overflow-x-auto justify-start lg:justify-center gap-4 md:gap-6 pb-4 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {categories.map((category, index) => (
             <Link

@@ -1,33 +1,72 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
-import { FiUser, FiSearch, FiChevronDown } from "react-icons/fi";
+import { FiUser, FiSearch, FiChevronDown, FiX } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { desktopNavigationGroups } from "@/data/navigation";
 import { useCart } from "@/context/CartContext";
+import { products } from "@/data/products";
+import { Product } from "@/types";
+import Image from "next/image";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAccountMenu, setShowAccountMenu] = useState(false);
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Update suggestions as user types
+  useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      const query = searchQuery.toLowerCase();
+
+      const filtered = products
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
+        )
+        .slice(0, 5);
+
+      setSuggestions(filtered);
+
+      // Product থাকুক বা না থাকুক dropdown show করবে
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery("");
+      setShowSuggestions(false);
     }
   };
 
   return (
     <nav className="hidden md:block border-b border-gray-200/50 bg-[#FCFAF6] sticky top-0 z-50">
-      <div className="container mx-auto px-4 lg:px-8 h-20 flex items-center justify-between">
+      <div className="container-standard h-20 flex items-center justify-between">
         {/* Left Section: Logo & Shop Link */}
         <div className="flex items-center gap-10 h-full">
           <Link href="/" className="flex items-center gap-3">
@@ -38,24 +77,19 @@ export const Navbar = () => {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Outer V */}
               <path
                 d="M4 10 L16 30 L28 10"
                 stroke="black"
                 strokeWidth="1.5"
                 strokeLinejoin="miter"
               />
-              {/* Center vertical */}
               <path d="M16 2 L16 30" stroke="black" strokeWidth="1.5" />
-              {/* Left vertical */}
               <path d="M10 6 L10 20" stroke="black" strokeWidth="1.5" />
-              {/* Right vertical */}
               <path d="M22 6 L22 20" stroke="black" strokeWidth="1.5" />
-              {/* Top horizontal connections */}
               <path d="M4 10 L10 10" stroke="black" strokeWidth="1.5" />
               <path d="M22 10 L28 10" stroke="black" strokeWidth="1.5" />
             </svg>
-            <span className="text-[22px] text-black font-medium tracking-[0.2em] mt-1">VOYΛGE</span>
+            <span className="text-xl text-black font-medium tracking-[0.2em] mt-1">VOYΛGE</span>
           </Link>
 
           <div className="group h-full flex items-center relative">
@@ -64,7 +98,7 @@ export const Navbar = () => {
               className="hidden md:flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity mt-1"
               aria-label="Open shop categories"
             >
-              <span className="text-[14px] tracking-widest font-medium text-gray-900">SHOP</span>
+              <span className="text-sm tracking-widest font-medium text-gray-900">SHOP</span>
               <FiChevronDown
                 className="group-hover:rotate-180 transition-transform duration-300 text-black"
                 size={14}
@@ -81,7 +115,7 @@ export const Navbar = () => {
                     <div key={group.name} className="flex flex-col gap-4">
                       <Link
                         href={group.href}
-                        className="font-semibold tracking-widest text-[15px] mb-2 text-gray-900 hover:text-[#B37068] transition-colors"
+                        className="font-semibold tracking-widest text-sm mb-2 text-gray-900 hover:text-[#B37068] transition-colors"
                         aria-label={`Browse ${category?.name ?? group.name}`}
                       >
                         {group.name}
@@ -90,7 +124,7 @@ export const Navbar = () => {
                         <Link
                           key={item.name}
                           href={item.href}
-                          className="text-gray-600 hover:text-black transition-colors text-[15px]"
+                          className="relative text-gray-600 hover:text-black text-sm transition-colors duration-300 ease-in-out pb-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
                         >
                           {item.name}
                         </Link>
@@ -104,22 +138,109 @@ export const Navbar = () => {
         </div>
 
         {/* Middle Section: Search Bar */}
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl mx-8">
-          <input
-            type="text"
-            placeholder="Search Product"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full border border-gray-300 text-black rounded-l-md px-4 py-2.5 bg-transparent focus:outline-none focus:border-[#B37068] focus:ring-1 focus:ring-[#B37068] text-sm placeholder:text-gray-400 transition-all duration-200"
-          />
-          <button
-            type="submit"
-            className="bg-[#B37068] hover:bg-[#9c6059] active:bg-[#8b5249] transition-colors px-6 rounded-r-md flex items-center justify-center border border-[#B37068] cursor-pointer"
-            aria-label="Search products"
-          >
-            <FiSearch size={18} color="white" strokeWidth={2} />
-          </button>
-        </form>
+        <div className="hidden md:flex flex-1 max-w-2xl mx-8 relative" ref={dropdownRef}>
+          <form onSubmit={handleSearch} className="flex w-full">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                autoComplete="off"
+                placeholder="Search Product"
+                value={searchQuery}
+                onFocus={() =>
+                  searchQuery.trim().length > 1 &&
+                  suggestions.length > 0 &&
+                  setShowSuggestions(true)
+                }
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full border border-gray-300 text-black rounded-l-md px-4 py-2.5 bg-transparent focus:outline-none focus:border-[#B37068] focus:ring-1 focus:ring-[#B37068] text-sm placeholder:text-gray-400 transition-all duration-200"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setShowSuggestions(false);
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <FiX size={14} />
+                </button>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="bg-[#B37068] hover:bg-[#9c6059] active:bg-[#8b5249] transition-colors px-6 rounded-r-md flex items-center justify-center border border-[#B37068] cursor-pointer"
+              aria-label="Search products"
+            >
+              <FiSearch size={18} color="white" strokeWidth={2} />
+            </button>
+          </form>
+
+          {/* Suggestions Dropdown */}
+          {showSuggestions && (
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-lg shadow-[0_10px_40px_-5px_rgba(0,0,0,0.1)] z-50 overflow-hidden">
+              <div className="p-2 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] pl-2">
+                  Top Suggestions
+                </span>
+              </div>
+
+              <div className="max-h-[350px] overflow-y-auto">
+                {suggestions.length > 0 ? (
+                  <>
+                    {suggestions.map((product) => (
+                      <Link
+                        key={product.id}
+                        href={`/product/${product.id}`}
+                        className="flex items-center gap-4 p-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
+                        onClick={() => {
+                          setSearchQuery("");
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        <div className="relative w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-gray-100">
+                          <Image
+                            src={product.images[0]}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {product.name}
+                          </h4>
+
+                          <p className="text-[11px] text-gray-500 capitalize">
+                            {product.category.replace("-", " ")}
+                          </p>
+                        </div>
+
+                        <div className="text-sm font-semibold text-[#B37068]">৳{product.price}</div>
+                      </Link>
+                    ))}
+
+                    <div
+                      onClick={(e) => handleSearch(e as any)}
+                      className="p-3 text-center text-xs font-semibold text-gray-500 hover:text-black hover:bg-gray-100 cursor-pointer transition-colors bg-gray-50/50"
+                    >
+                      View all results for &quot;{searchQuery}&quot;
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-8 px-4 text-center">
+                    <div className="text-sm font-semibold text-gray-700">No products found</div>
+
+                    <div className="text-xs text-gray-500 mt-1">
+                      No results found for &quot;{searchQuery}&quot;
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Right Section: Icons */}
         <div className="flex items-center gap-6">
@@ -137,24 +258,28 @@ export const Navbar = () => {
               <Link
                 href="/login"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                aria-label="Go to login page"
               >
                 Sign In
               </Link>
               <Link
                 href="/register"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                aria-label="Go to registration page"
               >
                 Create Account
               </Link>
               <Link
                 href="/profile"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                aria-label="Go to profile page"
               >
                 Profile
               </Link>
               <Link
                 href="/orders"
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                aria-label="Go to orders page"
               >
                 Orders
               </Link>
@@ -175,7 +300,7 @@ export const Navbar = () => {
           >
             <BsCart2 className="text-black" size={24} />
             {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[10px] font-medium w-4 h-4 flex items-center justify-center rounded-full">
+              <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                 {cartCount}
               </span>
             )}

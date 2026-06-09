@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-
 const bannerSlides = [
   {
     id: 1,
@@ -45,7 +44,7 @@ export const NewArrivalCarousel = () => {
   }, []);
 
   return (
-    <section className="w-full bg-[#FCFAF6] pb-12 pt-8">
+    <section className="w-full bg-[#FCFAF6] section-padding">
       <div className="relative w-full aspect-[21/9] md:aspect-[24/9] lg:aspect-[3/1] overflow-hidden group">
         {/* Slides */}
         {bannerSlides.map((slide, index) => (
@@ -56,14 +55,13 @@ export const NewArrivalCarousel = () => {
               index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
-            
             <Image
-            src={slide.image}
-            alt={slide.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="w-full h-full object-cover object-center"
-          />
+              src={slide.image}
+              alt={slide.title}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="w-full h-full object-cover object-center"
+            />
           </Link>
         ))}
 

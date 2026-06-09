@@ -4,16 +4,15 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube, FaMapMarkerAlt } from "
 
 export const NewsletterSection = () => {
   return (
-    <section className="container mx-auto px-4 lg:px-8 py-16 bg-[#FCFAF6] border-t border-[#D5C1B6]/20">
+    <section className="container-standard section-padding bg-[#FCFAF6] border-t border-[#D5C1B6]/20">
       <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-4xl text-[#3A322B] mb-4 tracking-wide font-serif font-bold">
-          Subscribe To Our Newsletter
-        </h2>
+        <h2 className="heading-section text-[#3A322B] mb-6">Subscribe To Our Newsletter</h2>
         <p className="text-gray-500 mb-10 leading-relaxed font-light italic">
-          Subscribing to our newsletter allows you access in to what we do and<br className="hidden md:block" /> our corporate activities.
+          Subscribing to our newsletter allows you access in to what we do and
+          <br className="hidden md:block" /> our corporate activities.
         </p>
 
-        <form 
+        <form
           className="flex flex-col md:flex-row gap-0 mb-12 shadow-sm rounded-md overflow-hidden"
           onSubmit={(e) => e.preventDefault()}
         >

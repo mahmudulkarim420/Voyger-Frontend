@@ -28,12 +28,10 @@ export default function SearchPageClient() {
 
   return (
     <div className="w-full min-h-screen bg-[#FCFAF6]">
-      <div className="border-b border-[#D5C1B6]/20 bg-[#FCFAF6] py-12">
-        <div className="container mx-auto px-4 lg:px-8">
+      <div className="border-b border-[#D5C1B6]/20 bg-[#FCFAF6] py-16">
+        <div className="container-standard">
           <div className="flex flex-col gap-8 max-w-4xl">
-            <h1 className="text-3xl font-serif font-light text-[#3A322B] tracking-wide">
-              Search Results
-            </h1>
+            <h1 className="heading-hero">Search Results</h1>
             <form
               onSubmit={handleSearch}
               className="flex w-full max-w-2xl shadow-sm rounded-[1px] overflow-hidden"
@@ -70,7 +68,7 @@ export default function SearchPageClient() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 lg:px-8 py-16">
+      <div className="container-standard section-padding">
         {filteredProducts.length > 0 ? (
           <div>
             <p className="text-[#6A5A4A] mb-12 italic font-light">

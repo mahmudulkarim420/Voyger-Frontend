@@ -52,13 +52,11 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
           )}
 
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/35 via-black/5 to-transparent p-3 opacity-0 transition duration-300 group-hover:opacity-100">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white">
-              View Details
-            </span>
+            <span className="text-card-detail text-white">View Details</span>
           </div>
 
           {(isSoldOut || isLowStock) && (
-            <span className="absolute left-3 top-3 bg-[#FCFAF6]/95 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#3A322B] shadow-sm">
+            <span className="absolute left-3 top-3 bg-[#FCFAF6]/95 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#3A322B] shadow-sm">
               {isSoldOut ? "Sold Out" : "Low Stock"}
             </span>
           )}
@@ -66,13 +64,13 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
 
         <div className="flex flex-1 flex-col border-b border-[#D5C1B6]/50 px-1 py-4">
           <div className="flex items-start justify-between gap-3">
-            <h3 className="text-sm font-medium leading-5 text-[#2F2923] transition-colors group-hover:text-[#A05C55]">
+            <h3 className="text-product-name transition-colors group-hover:text-[#A05C55]">
               {product.name}
             </h3>
             <div className="shrink-0 text-right">
-              <p className="text-sm font-semibold text-[#2F2923]">{formatPrice(product.price)}</p>
+              <p className="text-product-price">{formatPrice(product.price)}</p>
               {product.oldPrice && (
-                <p className="text-[11px] italic text-gray-400 line-through">
+                <p className="text-xs italic text-gray-400 line-through">
                   {formatPrice(product.oldPrice)}
                 </p>
               )}
@@ -86,7 +84,7 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
               {product.sizes.slice(0, 4).map((size) => (
                 <span
                   key={size}
-                  className="border border-[#D5C1B6]/70 px-2 py-1 text-[10px] font-medium text-[#6A5A4A]"
+                  className="border border-[#D5C1B6]/70 px-2 py-1 text-xs font-medium text-[#6A5A4A]"
                 >
                   {size}
                 </span>
@@ -98,4 +96,3 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
     </Link>
   );
 };
-
