@@ -1,14 +1,14 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
 import { FiUser, FiSearch, FiChevronDown, FiX } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { desktopNavigationGroups } from "@/data/navigation";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
-import { Product } from "@/types";
+import { formatPrice } from "@/lib/formatters";
 import Image from "next/image";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
@@ -16,7 +16,6 @@ const categoriesById = new Map(storeCategories.map((category) => [category.id, c
 export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -33,28 +32,19 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Update suggestions as user types
-  useEffect(() => {
-    if (searchQuery.trim().length > 1) {
-      const query = searchQuery.toLowerCase();
+  const suggestions = useMemo(() => {
+    if (searchQuery.trim().length <= 1) return [];
 
-      const filtered = products
-        .filter(
-          (p) =>
-            p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
-        )
-        .slice(0, 5);
+    const query = searchQuery.toLowerCase();
 
-      setSuggestions(filtered);
-
-      // Product থাকুক বা না থাকুক dropdown show করবে
-      setShowSuggestions(true);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
+    return products
+      .filter(
+        (p) => p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
+      )
+      .slice(0, 5);
   }, [searchQuery]);
 
+  const shouldShowSuggestions = showSuggestions && searchQuery.trim().length > 1;
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -62,6 +52,14 @@ export const Navbar = () => {
       setSearchQuery("");
       setShowSuggestions(false);
     }
+  };
+
+  const handleViewAllResults = () => {
+    if (!searchQuery.trim()) return;
+
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    setSearchQuery("");
+    setShowSuggestions(false);
   };
 
   return (
@@ -146,12 +144,11 @@ export const Navbar = () => {
                 autoComplete="off"
                 placeholder="Search Product"
                 value={searchQuery}
-                onFocus={() =>
-                  searchQuery.trim().length > 1 &&
-                  suggestions.length > 0 &&
-                  setShowSuggestions(true)
-                }
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.trim().length > 1 && setShowSuggestions(true)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowSuggestions(e.target.value.trim().length > 1);
+                }}
                 className="w-full border border-gray-300 text-black rounded-l-md px-4 py-2.5 bg-transparent focus:outline-none focus:border-[#B37068] focus:ring-1 focus:ring-[#B37068] text-sm placeholder:text-gray-400 transition-all duration-200"
               />
               {searchQuery && (
@@ -177,7 +174,7 @@ export const Navbar = () => {
           </form>
 
           {/* Suggestions Dropdown */}
-          {showSuggestions && (
+          {shouldShowSuggestions && (
             <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-lg shadow-[0_10px_40px_-5px_rgba(0,0,0,0.1)] z-50 overflow-hidden">
               <div className="p-2 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] pl-2">
@@ -217,16 +214,19 @@ export const Navbar = () => {
                           </p>
                         </div>
 
-                        <div className="text-sm font-semibold text-[#B37068]">৳{product.price}</div>
+                        <div className="text-sm font-semibold text-[#B37068]">
+                          {formatPrice(product.price)}
+                        </div>
                       </Link>
                     ))}
 
-                    <div
-                      onClick={(e) => handleSearch(e as any)}
-                      className="p-3 text-center text-xs font-semibold text-gray-500 hover:text-black hover:bg-gray-100 cursor-pointer transition-colors bg-gray-50/50"
+                    <button
+                      type="button"
+                      onClick={handleViewAllResults}
+                      className="w-full p-3 text-center text-xs font-semibold text-gray-500 hover:text-black hover:bg-gray-100 cursor-pointer transition-colors bg-gray-50/50"
                     >
                       View all results for &quot;{searchQuery}&quot;
-                    </div>
+                    </button>
                   </>
                 ) : (
                   <div className="py-8 px-4 text-center">

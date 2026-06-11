@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { LayoutDashboard, ShoppingCart, User, Settings, LogOut, Package, Star } from "lucide-react";
+import { LayoutDashboard, User, Settings, LogOut, Package, Star } from "lucide-react";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },

@@ -1,5 +1,5 @@
 import { getProductsByCategory } from "@/data/products";
-import { ProductCard } from "@/components/modules/products/ProductCard";
+import { ProductCard } from "@/features/products/ProductCard";
 import type { ProductCategorySlug } from "@/types";
 import Link from "next/link";
 

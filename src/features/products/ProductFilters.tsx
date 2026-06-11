@@ -1,75 +1,19 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiSearch, FiX } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
-import { products } from "@/data/products";
-import { Product } from "@/types";
-import Image from "next/image";
-import Link from "next/link";
 
 export const ProductFilters = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mounted, setMounted] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [sort, setSort] = useState("newest");
-  const [suggestions, setSuggestions] = useState<Product[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [search, setSearch] = useState(() => searchParams.get("search") || "");
+  const [category, setCategory] = useState(() => searchParams.get("category") || "all");
+  const [sort, setSort] = useState(() => searchParams.get("sort") || "newest");
 
-  // Sync state with URL initially
-  useEffect(() => {
-    setMounted(true);
-    setSearch(searchParams.get("search") || "");
-    setCategory(searchParams.get("category") || "all");
-    setSort(searchParams.get("sort") || "newest");
-  }, [searchParams]);
-
-  // Handle outside click to close suggestions
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Update suggestions when search changes
-  useEffect(() => {
-    if (search.trim().length > 1) {
-      const query = search.toLowerCase();
-      const filtered = products
-        .filter(
-          (p) =>
-            p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
-        )
-        .slice(0, 5); // Limit to top 5 suggestions
-      setSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [search]);
-
-  // Debounced URL update for live search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const urlSearch = searchParams.get("search") || "";
-      if (search !== urlSearch) {
-        updateFilters({ search });
-      }
-    }, 600);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  const updateFilters = (updates: Record<string, string>) => {
+  const updateFilters = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
 
     // We include current local search in params when updating other things
@@ -91,11 +35,10 @@ export const ProductFilters = () => {
     params.delete("page");
 
     router.push(`/products?${params.toString()}`, { scroll: false });
-  };
+  }, [router, search, searchParams]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSuggestions(false);
     updateFilters({ search });
   };
 
@@ -109,12 +52,10 @@ export const ProductFilters = () => {
   const hasActiveFilters = search || category !== "all" || sort !== "newest";
 
   return (
-    <div
-      className={`bg-white border-2 border-[#B37068]/5 rounded-2xl p-6 shadow-sm mb-10 transition-opacity duration-300 ${mounted ? "opacity-100" : "opacity-50"}`}
-    >
+    <div className="bg-white border-2 border-[#B37068]/5 rounded-2xl p-6 shadow-sm mb-10">
       <div className="flex flex-col lg:flex-row gap-6 items-center">
         {/* Search Bar Section */}
-        <div className="w-full lg:flex-1 relative" ref={dropdownRef}>
+        <div className="w-full lg:flex-1 relative">
           <label
             htmlFor="product-search"
             className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 ml-1"
@@ -130,9 +71,6 @@ export const ProductFilters = () => {
                 placeholder="What are you looking for?"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                onFocus={() =>
-                  search.trim().length > 1 && suggestions.length > 0 && setShowSuggestions(true)
-                }
                 className="w-full border border-gray-200 rounded-l-xl px-5 py-3 pl-12 text-sm focus:ring-2 focus:ring-[#B37068]/10 focus:border-[#B37068] outline-none transition-all"
               />
               <FiSearch
@@ -145,7 +83,6 @@ export const ProductFilters = () => {
                   type="button"
                   onClick={() => {
                     setSearch("");
-                    setShowSuggestions(false);
                   }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >

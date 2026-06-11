@@ -1,21 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types";
+import { formatPrice } from "@/lib/formatters";
 
 interface ProductCardProps {
   product: Product;
   priority?: boolean;
   className?: string;
 }
-
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat("en-BD", {
-    style: "currency",
-    currency: "BDT",
-    maximumFractionDigits: 0,
-  })
-    .format(price)
-    .replace("BDT", "Tk");
 
 export const ProductCard = ({ product, priority = false, className = "" }: ProductCardProps) => {
   const primaryImage = product.images[0] ?? "/images/solid-shirtssss.jpg.jpeg";

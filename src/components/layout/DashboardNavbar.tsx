@@ -1,5 +1,6 @@
 import React from "react";
-import { Search, Bell, User } from "lucide-react";
+import Image from "next/image";
+import { Search, Bell } from "lucide-react";
 
 export const DashboardNavbar = () => {
   return (
@@ -27,9 +28,11 @@ export const DashboardNavbar = () => {
             <p className="text-xs text-gray-500 mt-1">Premium Member</p>
           </div>
           <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 overflow-hidden">
-            <img
+            <Image
               src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100&h=100"
               alt="Avatar"
+              width={36}
+              height={36}
               className="w-full h-full object-cover"
             />
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icons/bs";
@@ -11,9 +11,9 @@ import {
   trendingSearches,
   utilityNavigation,
 } from "@/data/navigation";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
-import { Product } from "@/types";
+import { formatPrice } from "@/lib/formatters";
 import Image from "next/image";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
@@ -22,24 +22,19 @@ export const MobileNavigation = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<Product[]>([]);
   const router = useRouter();
   const { cartCount, setIsCartOpen } = useCart();
 
-  // Update suggestions as user types
-  useEffect(() => {
-    if (searchQuery.trim().length > 1) {
-      const query = searchQuery.toLowerCase();
-      const filtered = products
-        .filter(
-          (p) =>
-            p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
-        )
-        .slice(0, 6);
-      setSuggestions(filtered);
-    } else {
-      setSuggestions([]);
-    }
+  const suggestions = useMemo(() => {
+    if (searchQuery.trim().length <= 1) return [];
+
+    const query = searchQuery.toLowerCase();
+
+    return products
+      .filter(
+        (p) => p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
+      )
+      .slice(0, 6);
   }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -405,7 +400,7 @@ export const MobileNavigation = () => {
                           {product.category.replace("-", " ")}
                         </p>
                         <div className="mt-1 text-[13px] font-bold text-[#B37068]">
-                          ৳{product.price}
+                          {formatPrice(product.price)}
                         </div>
                       </div>
                     </Link>

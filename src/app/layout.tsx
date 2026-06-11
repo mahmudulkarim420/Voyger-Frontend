@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Voyage store",
 };
 
-import { CartProvider } from "@/context/CartContext";
+import { CartProvider } from "@/store/CartContext";
 
 export default function RootLayout({
   children,

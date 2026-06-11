@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { products } from "@/data/products";
-import { ProductCard } from "@/components/modules/products/ProductCard";
+import { ProductCard } from "@/features/products/ProductCard";
 
 export default function SearchPageClient() {
   const searchParams = useSearchParams();

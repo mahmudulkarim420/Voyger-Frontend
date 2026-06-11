@@ -1,15 +1,15 @@
-import { BannerCarousel } from "@/components/modules/home/BannerCarousel";
-import { CategoryBar } from "@/components/modules/home/CategoryBar";
-import { CategoryGrid } from "@/components/modules/home/CategoryGrid";
-import { CasualShirtSection } from "@/components/modules/home/CasualShirtSection";
-import { CottonSolidShirtSection } from "@/components/modules/home/CottonSolidShirtSection";
-import { CottonSolidCarousel } from "@/components/modules/home/CottonSolidCarousel";
-import { CasualDenimShirtSection } from "@/components/modules/home/CasualDenimShirtSection";
-import { TailorFitFormalPantSection } from "@/components/modules/home/TailorFitFormalPantSection";
-import { InspiredBySection } from "@/components/modules/home/InspiredBySection";
-import { NewsletterSection } from "@/components/modules/home/NewsletterSection";
-import { LuxuryPanjabiSection } from "@/components/modules/home/LuxuryPanjabiSection";
-import { NewArrivalCarousel } from "@/components/modules/home/NewArrivalCarousel";
+import { BannerCarousel } from "@/features/home/BannerCarousel";
+import { CategoryBar } from "@/features/home/CategoryBar";
+import { CategoryGrid } from "@/features/home/CategoryGrid";
+import { CasualShirtSection } from "@/features/home/CasualShirtSection";
+import { CottonSolidShirtSection } from "@/features/home/CottonSolidShirtSection";
+import { CottonSolidCarousel } from "@/features/home/CottonSolidCarousel";
+import { CasualDenimShirtSection } from "@/features/home/CasualDenimShirtSection";
+import { TailorFitFormalPantSection } from "@/features/home/TailorFitFormalPantSection";
+import { InspiredBySection } from "@/features/home/InspiredBySection";
+import { NewsletterSection } from "@/features/home/NewsletterSection";
+import { LuxuryPanjabiSection } from "@/features/home/LuxuryPanjabiSection";
+import { NewArrivalCarousel } from "@/features/home/NewArrivalCarousel";
 
 export default function Home() {
   return (

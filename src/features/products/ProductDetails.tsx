@@ -18,22 +18,14 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 import { IoBagOutline } from "react-icons/io5";
 import type { Product } from "@/types";
-import { useCart } from "@/context/CartContext";
+import { useCart } from "@/hooks/useCart";
+import { formatPrice } from "@/lib/formatters";
 
 interface ProductDetailsProps {
   product: Product;
   relatedProducts: Product[];
   similarProducts: Product[];
 }
-
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat("en-BD", {
-    style: "currency",
-    currency: "BDT",
-    maximumFractionDigits: 0,
-  })
-    .format(price)
-    .replace("BDT", "Tk");
 
 export default function ProductDetails({
   product,

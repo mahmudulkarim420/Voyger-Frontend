@@ -5,16 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoCloseOutline, IoTrashOutline, IoBagOutline } from "react-icons/io5";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import { useCart } from "@/context/CartContext";
-
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat("en-BD", {
-    style: "currency",
-    currency: "BDT",
-    maximumFractionDigits: 0,
-  })
-    .format(price)
-    .replace("BDT", "Tk");
+import { useCart } from "@/hooks/useCart";
+import { formatPrice } from "@/lib/formatters";
 
 export const CartDrawer = () => {
   const {
