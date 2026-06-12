@@ -53,9 +53,9 @@ export const CategoryGrid = () => {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            {/* Label overlay */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#FCFAF6] px-6 py-2 rounded-[2px] shadow-sm border border-[#D5C1B6]/50 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-lg group-hover:bg-white">
-              <span className="text-[14px] font-medium text-gray-900 whitespace-nowrap tracking-wide">
+            {/* Label overlay - মোবাইলের জন্য ছোট করা হয়েছে */}
+            <div className="absolute bottom-2 md:bottom-4 left-1/2 -translate-x-1/2 bg-[#FCFAF6] py-1 md:px-6 md:py-2 rounded-md shadow-sm border border-[#D5C1B6]/50 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-lg group-hover:bg-white w-[85%] md:w-auto text-center">
+              <span className="text-[12px] md:text-[14px] font-medium text-gray-900 whitespace-nowrap md:tracking-wide">
                 {item.name}
               </span>
             </div>

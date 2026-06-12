@@ -54,7 +54,8 @@ export const CasualShirtSection = () => {
           />
           <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-300" />
           <div className="absolute bottom-6 left-0 right-0 text-center">
-            <span className="text-white font-bold tracking-widest text-lg drop-shadow-md">
+            {/* এখানেই মূল পরিবর্তনগুলো করা হয়েছে */}
+            <span className="inline-block px-6 py-2 text-white font-bold tracking-widest text-lg drop-shadow-md transition-all duration-300 group-hover:bg-white group-hover:text-black rounded-md">
               CHECKED SHIRT
             </span>
           </div>

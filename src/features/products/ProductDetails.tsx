@@ -319,7 +319,7 @@ export default function ProductDetails({
           {relatedProducts.length > 0 && (
             <div className="lg:col-span-9">
               <h2 className="heading-section mb-10">Related Products</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
                 {relatedProducts.map((item) => (
                   <Link key={item.id} href={`/product/${item.id}`} className="flex flex-col group">
                     <div className="relative aspect-square overflow-hidden rounded-[2px] mb-6 shadow-sm bg-white">
@@ -356,14 +356,15 @@ export default function ProductDetails({
           {similarProducts.length > 0 && (
             <div className="lg:col-span-3">
               <h2 className="heading-section mb-10">Similar Products</h2>
-              <div className="flex flex-col gap-6">
+
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:gap-6">
                 {similarProducts.map((item) => (
                   <Link
                     key={item.id}
                     href={`/product/${item.id}`}
-                    className="flex gap-4 group items-center"
+                    className="flex gap-3 md:gap-4 group items-center"
                   >
-                    <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded-[1px] shadow-sm bg-white">
+                    <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 overflow-hidden rounded-[1px] shadow-sm bg-white">
                       <Image
                         src={item.images[0]}
                         alt={item.name}
@@ -373,15 +374,15 @@ export default function ProductDetails({
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <h3 className="text-xs font-bold text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide uppercase">
+                      <h3 className="text-[10px] md:text-xs font-bold text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide uppercase">
                         {item.name}
                       </h3>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                         <span className="text-xs font-bold text-[#3A322B]">
                           {formatPrice(item.price)}
                         </span>
                         {item.oldPrice && (
-                          <div className="relative text-xs text-gray-400 italic">
+                          <div className="relative text-[10px] md:text-xs text-gray-400 italic w-fit">
                             {formatPrice(item.oldPrice)}
                             <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gray-300 -rotate-3" />
                           </div>

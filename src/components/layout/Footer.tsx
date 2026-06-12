@@ -3,9 +3,11 @@ import Link from "next/link";
 export const Footer = () => {
   return (
     <footer className="bg-[#F4EBE4] mt-auto">
-      <div className="container-standard section-padding grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-        {/* Logo Section */}
-        <div className="md:col-span-3">
+      {/* এখানে grid-cols-1 এর বদলে grid-cols-2 দেওয়া হয়েছে মোবাইলের জন্য */}
+      <div className="container-standard section-padding grid grid-cols-2 md:grid-cols-12 gap-x-4 gap-y-8 lg:gap-12">
+        
+        {/* Logo Section - মোবাইলে ফুল উইডথ (col-span-2) */}
+        <div className="col-span-2 md:col-span-3">
           <Link href="/" className="flex items-center gap-3">
             <svg
               width="32"
@@ -30,8 +32,8 @@ export const Footer = () => {
           </Link>
         </div>
 
-        {/* Our Info */}
-        <div className="md:col-span-3">
+        {/* Our Info - মোবাইলে অর্ধেক উইডথ (col-span-1) */}
+        <div className="col-span-1 md:col-span-3">
           <h4 className="font-semibold mb-6 text-sm uppercase tracking-widest text-gray-900">
             OUR INFO
           </h4>
@@ -59,8 +61,8 @@ export const Footer = () => {
           </ul>
         </div>
 
-        {/* Policies */}
-        <div className="md:col-span-3">
+        {/* Policies - মোবাইলে অর্ধেক উইডথ (col-span-1) */}
+        <div className="col-span-1 md:col-span-3">
           <h4 className="font-semibold mb-6 text-sm uppercase tracking-widest text-gray-900">
             POLICIES
           </h4>
@@ -88,8 +90,8 @@ export const Footer = () => {
           </ul>
         </div>
 
-        {/* Contact Us */}
-        <div className="md:col-span-3">
+        {/* Contact Us - মোবাইলে ফুল উইডথ (col-span-2) */}
+        <div className="col-span-2 md:col-span-3">
           <h4 className="font-semibold mb-6 text-sm uppercase tracking-widest text-gray-900">
             CONTACT US
           </h4>
@@ -110,12 +112,12 @@ export const Footer = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-[#D5C1B6]/30">
-        <div className="container-standard py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="container-standard py-6 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4 text-center md:text-left">
           <div className="text-sm text-gray-800">
             © Copyright Reserved to <strong className="font-semibold">Voyage</strong>
           </div>
 
-          <div className="flex gap-3 items-center">
+          <div className="flex flex-wrap justify-center gap-3 items-center">
             {/* Visa */}
             <div className="bg-white px-2 py-1 rounded shadow-sm flex items-center justify-center w-[46px] h-[28px]">
               <svg

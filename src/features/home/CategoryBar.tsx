@@ -23,7 +23,7 @@ export const CategoryBar = () => {
   };
 
   return (
-    <section className="w-full bg-[#FCFAF6] section-padding">
+    <section className="w-full bg-[#FCFAF6] mt-7">
       <style>{`
         @keyframes spreadFill {
           from {
@@ -35,7 +35,8 @@ export const CategoryBar = () => {
         }
       `}</style>
       <div className="container-standard">
-        <div className="flex flex-nowrap overflow-x-auto justify-start lg:justify-center gap-4 md:gap-6 pb-4 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {/* মোবাইলের জন্য গ্যাপ কমানো হয়েছে (gap-3) */}
+        <div className="flex flex-nowrap overflow-x-auto justify-start lg:justify-center gap-3 md:gap-6 pb-4 lg:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {categories.map((category, index) => (
             <Link
               key={category.name}
@@ -43,7 +44,8 @@ export const CategoryBar = () => {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
               onMouseMove={handleMouseMove}
-              className="group shrink-0 w-[160px] md:w-[220px] h-16 md:h-[72px] flex items-center justify-center relative overflow-hidden rounded-sm"
+              /* মোবাইলের জন্য বাটনের উচ্চতা ও প্রস্থ ছোট করা হয়েছে */
+              className="group shrink-0 w-[120px] md:w-[220px] h-[44px] md:h-[72px] flex items-center justify-center relative overflow-hidden rounded-sm"
             >
               {/* Base Background */}
               <div className="absolute inset-0 bg-[#F4EBE4] border border-[#B37068] transition-all duration-300" />
@@ -62,9 +64,9 @@ export const CategoryBar = () => {
                 />
               )}
 
-              {/* Text */}
+              {/* Text - মোবাইলের জন্য ফন্ট সাইজ এবং লেটার স্পেসিং কমানো হয়েছে */}
               <span
-                className={`relative z-10 tracking-[0.12em] text-[13px] md:text-[15px] font-semibold uppercase transition-colors duration-300 ${
+                className={`relative z-10 tracking-[0.08em] md:tracking-[0.12em] text-[11px] md:text-[15px] font-semibold uppercase transition-colors duration-300 ${
                   hoveredIndex === index ? "text-white" : "text-gray-900"
                 }`}
               >

@@ -20,7 +20,8 @@ export default function ShopPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* গ্যাপ মোবাইলের জন্য একটু কমানো হয়েছে (gap-4) যাতে ইমেজের জায়গা বেশি পাওয়া যায় */}
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {categories.map((category) => (
             <Link
               key={category.slug}
@@ -34,10 +35,18 @@ export default function ShopPage() {
                 className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 p-8 w-full flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-white tracking-tight">{category.name}</h2>
-                <div className="bg-white/20 backdrop-blur-md p-2 rounded-full text-white transform translate-x-4 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">
-                  <ChevronRight className="w-6 h-6" />
+              
+              {/* এখানে justify-center (মোবাইলের জন্য) এবং md:justify-between যুক্ত করা হয়েছে, প্যাডিং p-3 করা হয়েছে */}
+              <div className="absolute bottom-0 left-0 p-3 md:p-8 w-full flex items-center justify-center md:justify-between">
+                
+                {/* whitespace-nowrap টেক্সটকে ১ লাইনে রাখবে */}
+                <h2 className="text-[14px] sm:text-base md:text-2xl font-bold text-white whitespace-nowrap text-center">
+                  {category.name}
+                </h2>
+                
+                {/* আইকনটি মোবাইলে absolute রাখা হয়েছে যেন টেক্সট একদম পারফেক্ট সেন্টারে থাকে */}
+                <div className="absolute right-2 md:relative md:right-0 bg-white/20 backdrop-blur-md p-1.5 md:p-2 rounded-full text-white transform translate-x-4 opacity-0 transition group-hover:translate-x-0 group-hover:opacity-100">
+                  <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
                 </div>
               </div>
             </Link>
