@@ -43,9 +43,6 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
             />
           )}
 
-          <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-black/35 via-black/5 to-transparent p-3 opacity-0 transition duration-300 group-hover:opacity-100">
-            <span className="text-card-detail text-white">View Details</span>
-          </div>
 
           {(isSoldOut || isLowStock) && (
             <span className="absolute left-3 top-3 bg-[#FCFAF6]/95 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#3A322B] shadow-sm">

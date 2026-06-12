@@ -7,6 +7,7 @@ import { IoTrashOutline } from "react-icons/io5";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/formatters";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
@@ -118,22 +119,28 @@ export default function CartPage() {
               <p className="text-xs text-gray-400 italic">
                 Taxes, discounts and shipping calculated at checkout.
               </p>
-              <Link
-                href="/checkout"
-                className="w-full md:w-80 py-4 bg-[#A05C55] text-white text-center font-bold tracking-[0.2em] text-xs uppercase hover:bg-[#8e524b] transition-all duration-300 rounded-[1px] shadow-md"
-              >
-                Check out
+              <Link href="/checkout" className="w-full md:w-80">
+                <HoverButton
+                  variant="primary"
+                  size="lg"
+                  className="w-full rounded-[1px] uppercase tracking-[0.2em]"
+                >
+                  Check out
+                </HoverButton>
               </Link>
             </div>
           </>
         ) : (
           <div className="py-32 text-center">
             <h2 className="text-2xl font-serif text-[#3A322B] mb-6">Your cart is empty</h2>
-            <Link
-              href="/"
-              className="bg-[#A05C55] text-white px-12 py-4 rounded-[1px] font-bold tracking-[0.2em] text-xs uppercase hover:bg-[#8e524b] transition-all shadow-md inline-block"
-            >
-              Continue shopping
+            <Link href="/">
+              <HoverButton
+                variant="primary"
+                size="lg"
+                className="px-12 rounded-[1px] uppercase tracking-[0.2em]"
+              >
+                Continue shopping
+              </HoverButton>
             </Link>
           </div>
         )}

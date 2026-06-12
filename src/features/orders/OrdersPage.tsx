@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { FiPackage, FiChevronRight } from "react-icons/fi";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 const mockOrders = [
   {
@@ -13,17 +14,17 @@ const mockOrders = [
     items: [
       {
         name: "Luxury Panjabi-1067",
-        image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Male%20model%20wearing%20navy%20luxury%20panjabi&image_size=square",
+        image: "/images/vp-1067i.jpg.jpeg",
         size: "L",
-        quantity: 1
+        quantity: 1,
       },
       {
         name: "Formal - Sky",
-        image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Male%20model%20wearing%20sky%20blue%20formal%20shirt&image_size=square",
+        image: "/images/sky-i.jpg.jpeg",
         size: "M",
-        quantity: 1
-      }
-    ]
+        quantity: 1,
+      },
+    ],
   },
   {
     id: "ORD-8812-Y45",
@@ -33,12 +34,12 @@ const mockOrders = [
     items: [
       {
         name: "Stripe Shirt -434",
-        image: "https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Male%20model%20wearing%20stripe%20shirt&image_size=square",
+        image: "/images/vc-434.jpg.jpeg",
         size: "L",
-        quantity: 1
-      }
-    ]
-  }
+        quantity: 1,
+      },
+    ],
+  },
 ];
 
 export default function OrdersPage() {
@@ -50,27 +51,40 @@ export default function OrdersPage() {
         <div className="space-y-6">
           {mockOrders.length > 0 ? (
             mockOrders.map((order) => (
-              <div key={order.id} className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50 overflow-hidden transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)]">
+              <div
+                key={order.id}
+                className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50 overflow-hidden transition-all hover:shadow-[0_8px_30px_rgba(0,0,0,0.05)]"
+              >
                 {/* Order Header */}
                 <div className="bg-gray-50/50 px-8 py-4 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
                   <div className="flex gap-8">
                     <div>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Order Placed</p>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">
+                        Order Placed
+                      </p>
                       <p className="text-sm text-gray-700 font-medium">{order.date}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Total</p>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">
+                        Total
+                      </p>
                       <p className="text-sm text-gray-700 font-medium">{order.total}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Order #</p>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">
+                        Order #
+                      </p>
                       <p className="text-sm text-gray-700 font-medium">{order.id}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        order.status === "Delivered"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-blue-100 text-blue-700"
+                      }`}
+                    >
                       {order.status}
                     </span>
                     <button className="p-2 text-gray-400 hover:text-black transition-colors">
@@ -89,11 +103,13 @@ export default function OrdersPage() {
                         </div>
                         <div className="flex-1">
                           <h4 className="text-sm font-bold text-gray-900 mb-1">{item.name}</h4>
-                          <p className="text-xs text-gray-500">Size: {item.size} • Qty: {item.quantity}</p>
+                          <p className="text-xs text-gray-500">
+                            Size: {item.size} • Qty: {item.quantity}
+                          </p>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-700 text-xs font-medium transition-colors">
+                        <HoverButton variant="primary" size="sm" className="whitespace-nowrap rounded-md">
                           Buy it again
-                        </button>
+                        </HoverButton>
                       </div>
                     ))}
                   </div>
@@ -107,9 +123,9 @@ export default function OrdersPage() {
               </div>
               <h2 className="text-lg font-bold text-gray-900 mb-2">No orders found</h2>
               <p className="text-sm text-gray-500 mb-8">You haven&apos;t placed any orders yet.</p>
-              <button className="bg-[#A05C55] text-white px-10 py-3 rounded-lg font-bold tracking-widest text-xs uppercase hover:bg-[#8e524b] transition-all shadow-md">
+              <HoverButton variant="primary" size="lg" href="/products">
                 Start Shopping
-              </button>
+              </HoverButton>
             </div>
           )}
         </div>

@@ -20,6 +20,7 @@ import { IoBagOutline } from "react-icons/io5";
 import type { Product } from "@/types";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/formatters";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 interface ProductDetailsProps {
   product: Product;
@@ -33,7 +34,7 @@ export default function ProductDetails({
   similarProducts,
 }: ProductDetailsProps) {
   const router = useRouter();
-  const { addToCart } = useCart();
+  const { addToCart, setIsCartOpen } = useCart();
   const sizes = product.sizes ?? ["M", "L", "XL"];
   const [selectedSize, setSelectedSize] = useState(sizes[0]);
   const [quantity, setQuantity] = useState(1);
@@ -210,22 +211,27 @@ export default function ProductDetails({
             </div>
 
             <div className="flex flex-col gap-3 mb-10">
-              <button
+              <HoverButton
                 onClick={() => addToCart(product, selectedSize)}
-                className="w-full bg-[#A05C55] hover:bg-[#8e524b] text-white py-[14px] rounded-[1px] flex items-center justify-center gap-3 font-bold tracking-[2px] text-xs transition-all uppercase shadow-sm"
+                variant="primary"
+                size="lg"
+                className="w-full flex gap-3 rounded-md"
               >
                 <IoBagOutline size={16} />
                 Add to Cart
-              </button>
-              <button
+              </HoverButton>
+              <HoverButton
                 onClick={() => {
                   addToCart(product, selectedSize);
+                  setIsCartOpen(false);
                   router.push("/checkout");
                 }}
-                className="w-full bg-[#6C714D] hover:bg-[#606544] text-white py-[14px] rounded-[1px] font-bold tracking-[2px] text-xs transition-all uppercase shadow-sm"
+                variant="success"
+                size="lg"
+                className="w-full rounded-md"
               >
                 Buy It Now
-              </button>
+              </HoverButton>
             </div>
 
             <div className="flex items-center gap-4 mb-10">
@@ -312,7 +318,7 @@ export default function ProductDetails({
                       />
                     </div>
                     <div className="bg-[#F8F3EE] px-4 py-4 rounded-[1px] text-center border border-[#E9E1D8]/50">
-                      <h3 className="text-card-detail mb-2 group-hover:text-[#A05C55] transition-colors tracking-wider uppercase">
+                      <h3 className="text-card-detail mb-2 text-gray-600 group-hover:text-[#A05C55] transition-colors tracking-wider uppercase">
                         {item.name}
                       </h3>
                       <div className="flex items-center justify-center gap-3">

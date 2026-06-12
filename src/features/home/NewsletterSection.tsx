@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/Button";
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube, FaMapMarkerAlt } from "react-icons/fa";
 
 export const NewsletterSection = () => {
@@ -22,12 +23,9 @@ export const NewsletterSection = () => {
             className="flex-1 px-6 py-4 bg-white border border-gray-200 focus:outline-none text-gray-700"
             required
           />
-          <button
-            type="submit"
-            className="bg-[#B37068] hover:bg-[#9c6059] text-white px-10 py-4 font-bold tracking-widest transition-colors uppercase text-sm"
-          >
+          <Button className="px-10 rounded-none uppercase bg-[#B37068] tracking-widest">
             SUBSCRIBE
-          </button>
+          </Button>
         </form>
 
         <div className="flex flex-col items-center gap-8">

@@ -6,7 +6,7 @@ import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/formatters";
 import { IoHelpCircleOutline } from "react-icons/io5";
 import { FaChevronDown } from "react-icons/fa";
-
+import { HoverButton } from "@/components/ui/HoverButton";
 
 const shippingMethods = [
   { id: "in-dhaka", label: "In Dhaka", price: 70 },
@@ -237,9 +237,9 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <button className="w-full bg-[#A05C55] hover:bg-[#8e524b] active:bg-[#7a4840] text-white py-5 rounded-md font-bold tracking-[0.1em] text-sm transition-all mb-12 shadow-md uppercase">
+            <HoverButton variant="primary" size="lg" className="w-full rounded-md mb-12">
               Pay now
-            </button>
+            </HoverButton>
           </div>
 
           {/* Right Column: Order Summary */}

@@ -41,7 +41,7 @@ export const CottonSolidShirtSection = () => {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Link
-          href="/shop/solid-shirt/formal"
+          href="/shop/solid-shirt"
           className="col-span-2 md:col-span-1 md:row-span-2 relative group overflow-hidden rounded-sm min-h-[400px] md:min-h-0 shadow-sm"
         >
           <Image

@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { products } from "@/data/products";
 import { ProductCard } from "@/features/products/ProductCard";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 export default function SearchPageClient() {
   const searchParams = useSearchParams();
@@ -43,9 +44,11 @@ export default function SearchPageClient() {
                 defaultValue={query}
                 className="flex-1 border border-[#D5C1B6]/30 text-[#3A322B] px-6 py-4 bg-white focus:outline-none focus:border-[#A05C55] text-sm placeholder:text-gray-300 transition-all duration-300"
               />
-              <button
+              <HoverButton
                 type="submit"
-                className="bg-[#A05C55] hover:bg-[#8e524b] transition-all px-10 flex items-center justify-center border border-[#A05C55] cursor-pointer group"
+                variant="primary"
+                size="md"
+                className="rounded-none border-none p-0 px-6 w-auto"
                 aria-label="Submit search"
               >
                 <svg
@@ -53,7 +56,7 @@ export default function SearchPageClient() {
                   height="18"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="white"
+                  stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -62,7 +65,7 @@ export default function SearchPageClient() {
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
-              </button>
+              </HoverButton>
             </form>
           </div>
         </div>

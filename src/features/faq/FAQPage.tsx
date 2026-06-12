@@ -5,6 +5,7 @@ import { BrandPillars } from "@/components/shared/BrandPillars";
 import { PageHero } from "@/components/shared/PageHero";
 import { useState } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 const faqs = [
   {
@@ -63,13 +64,14 @@ export default function FAQPage() {
                 Find quick answers to common questions about our products, shipping, and service.
                 We&apos;re here to help you make your shopping experience seamless.
               </p>
-              <Link
-                href="/about"
-                className="group relative inline-flex items-center gap-2 bg-[#2F2923] text-white px-10 py-4 uppercase tracking-widest text-sm font-medium hover:bg-[#B37068] transition-all duration-500 overflow-hidden"
-              >
-                <span className="relative z-10 transition-colors duration-500">
+              <Link href="/about">
+                <HoverButton
+                  variant="dark"
+                  size="lg"
+                  className="rounded-none uppercase tracking-widest"
+                >
                   About Our Story
-                </span>
+                </HoverButton>
               </Link>
             </div>
 

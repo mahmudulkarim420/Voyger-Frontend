@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 export default function RegisterPage() {
   return (
@@ -15,7 +16,7 @@ export default function RegisterPage() {
           <input
             type="text"
             placeholder="John Doe"
-            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all"
+            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
           />
         </div>
         <div className="space-y-1">
@@ -23,7 +24,7 @@ export default function RegisterPage() {
           <input
             type="email"
             placeholder="name@example.com"
-            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all"
+            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
           />
         </div>
         <div className="space-y-1">
@@ -31,12 +32,12 @@ export default function RegisterPage() {
           <input
             type="password"
             placeholder="••••••••"
-            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all"
+            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
           />
         </div>
-        <button className="w-full py-3 bg-black text-white rounded-xl font-semibold hover:bg-gray-900 transition-colors">
+        <HoverButton variant="dark" size="lg" className="w-full rounded-xl">
           Create Account
-        </button>
+        </HoverButton>
       </form>
 
       <div className="text-center">

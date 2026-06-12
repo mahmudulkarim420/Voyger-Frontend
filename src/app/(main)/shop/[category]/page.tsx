@@ -1,4 +1,5 @@
-import { getProductsByCategory } from "@/data/products";
+import { products, featuredProducts } from "@/data/products";
+import { storeCategories } from "@/data/categories";
 import { ProductCard } from "@/features/products/ProductCard";
 import type { ProductCategorySlug } from "@/types";
 import Link from "next/link";
@@ -10,8 +11,41 @@ interface CategoryPageProps {
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
 
-  const products = getProductsByCategory(category as ProductCategorySlug);
-  const categoryTitle = category.replace("-", " ").toUpperCase();
+  let filteredProducts = [];
+
+  // Special handling for new-arrivals category
+  if (category === "new-arrivals") {
+    // Show featured products for new-arrivals
+    filteredProducts = featuredProducts;
+  } else {
+    // Get products for this category and all its subcategories
+    const categoriesToInclude: ProductCategorySlug[] = [category as ProductCategorySlug];
+
+    // Find all subcategories if this is a parent category
+    const subCategories = storeCategories
+      .filter((cat) => cat.parentId === category)
+      .map((cat) => cat.id);
+
+    categoriesToInclude.push(...subCategories);
+
+    // Filter products by category and subcategories
+    filteredProducts = products.filter((p) => categoriesToInclude.includes(p.category));
+  }
+
+  // Format category title
+  const getCategoryName = (): string => {
+    const categoryData = storeCategories.find((cat) => cat.id === category);
+    if (categoryData) {
+      return categoryData.name;
+    }
+    // Fallback: convert slug to title case
+    return category
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const categoryTitle = getCategoryName();
 
   return (
     <div className="w-full bg-[#FCFAF6] min-h-screen">
@@ -20,9 +54,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           {categoryTitle}
         </h1>
 
-        {products.length > 0 ? (
+        {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-            {products.map((product, idx) => (
+            {filteredProducts.map((product, idx) => (
               <ProductCard key={product.id} product={product} priority={idx < 4} />
             ))}
           </div>

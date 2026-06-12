@@ -7,6 +7,7 @@ import { IoCloseOutline, IoTrashOutline, IoBagOutline } from "react-icons/io5";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/formatters";
+import { HoverButton } from "@/components/ui/HoverButton";
 
 export const CartDrawer = () => {
   const {
@@ -20,8 +21,6 @@ export const CartDrawer = () => {
   } = useCart();
 
   const [isClosing, setIsClosing] = useState(false);
-  const [hoveredButton, setHoveredButton] = useState<"view-cart" | "checkout" | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   if (!isCartOpen && !isClosing) return null;
 
@@ -33,27 +32,8 @@ export const CartDrawer = () => {
     }, 600);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x, y });
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
-      {/* Keyframe Injector */}
-      <style>{`
-        @keyframes spreadFill {
-          from {
-            clip-path: circle(0% at var(--mouse-x, 50%) var(--mouse-y, 50%));
-          }
-          to {
-            clip-path: circle(150% at var(--mouse-x, 50%) var(--mouse-y, 50%));
-          }
-        }
-      `}</style>
-
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] ${
@@ -154,12 +134,14 @@ export const CartDrawer = () => {
                 <IoBagOutline className="text-[#A05C55] opacity-40" size={32} />
               </div>
               <p className="text-[#6A5A4A] italic font-light mb-8">Your cart is currently empty.</p>
-              <button
+              <HoverButton
                 onClick={() => setIsCartOpen(false)}
-                className="bg-[#A05C55] text-white px-10 py-3 rounded-[1px] font-bold tracking-[2px] text-xs uppercase shadow-sm"
+                variant="primary"
+                size="md"
+                className="rounded-[1px]"
               >
                 Continue Shopping
-              </button>
+              </HoverButton>
             </div>
           )}
         </div>
@@ -176,74 +158,26 @@ export const CartDrawer = () => {
 
             <div className="flex flex-col gap-3">
               {/* View Cart Button */}
-              <Link
+              <HoverButton
+                variant="secondary"
+                size="lg"
                 href="/cart"
                 onClick={handleClose}
-                onMouseEnter={() => setHoveredButton("view-cart")}
-                onMouseLeave={() => setHoveredButton(null)}
-                onMouseMove={handleMouseMove}
-                className="w-full py-4 text-center font-bold tracking-[0.2em] text-xs uppercase rounded-[1px] relative overflow-hidden group block"
+                className="w-full rounded-[1px] border border-slate-900 uppercase tracking-[0.2em]"
               >
-                <div
-                  className={`absolute inset-0 border transition-all duration-300 ${hoveredButton === "view-cart" ? "border-[#A05C55]" : "border-[#D5C1B6]"}`}
-                />
-                {hoveredButton === "view-cart" && (
-                  <div
-                    className="absolute inset-0 bg-[#A05C55]"
-                    style={
-                      {
-                        "--mouse-x": `${mousePos.x}%`,
-                        "--mouse-y": `${mousePos.y}%`,
-                        animation: "spreadFill 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
-                      } as React.CSSProperties
-                    }
-                  />
-                )}
-                <span
-                  className={`relative z-10 transition-colors duration-300 ${hoveredButton === "view-cart" ? "text-white" : "text-[#A05C55]"}`}
-                >
-                  View Cart
-                </span>
-              </Link>
+                View Cart
+              </HoverButton>
 
               {/* Checkout Button */}
-              <Link
+              <HoverButton
+                variant="primary"
+                size="lg"
                 href="/checkout"
                 onClick={handleClose}
-                onMouseEnter={() => setHoveredButton("checkout")}
-                onMouseLeave={() => setHoveredButton(null)}
-                onMouseMove={handleMouseMove}
-                className="w-full py-4 text-center font-bold tracking-[0.2em] text-xs uppercase rounded-[1px] relative overflow-hidden block"
+                className="w-full rounded-[1px] uppercase tracking-[0.2em]"
               >
-                {/* Background */}
-                <div className="absolute inset-0 bg-[#A05C55]" />
-
-                {/* Hover Fill */}
-                {hoveredButton === "checkout" && (
-                  <div
-                    className="absolute inset-0 bg-[#FCFAF6]"
-                    style={
-                      {
-                        "--mouse-x": `${mousePos.x}%`,
-                        "--mouse-y": `${mousePos.y}%`,
-                        animation: "spreadFill 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards",
-                      } as React.CSSProperties
-                    }
-                  />
-                )}
-
-                {/* Border - always on top */}
-                <div className="absolute inset-0 border border-[#A05C55] z-[5]" />
-
-                {/* Text */}
-                <span
-                  className={`relative z-10 transition-colors duration-300 ${
-                    hoveredButton === "checkout" ? "text-[#A05C55]" : "text-[#D5C1B6]"
-                  }`}
-                >
-                  Checkout
-                </span>
-              </Link>
+                Checkout
+              </HoverButton>
             </div>
             <p className="mt-6 text-center text-xs text-gray-400 italic">
               Shipping, taxes, and discount codes calculated at checkout
