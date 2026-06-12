@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import { Search, Bell } from "lucide-react";
 
 export const DashboardNavbar = () => {

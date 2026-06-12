@@ -9,7 +9,7 @@ import { desktopNavigationGroups } from "@/data/navigation";
 import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 

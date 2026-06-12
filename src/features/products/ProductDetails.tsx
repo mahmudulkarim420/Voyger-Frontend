@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -40,6 +40,8 @@ export default function ProductDetails({
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [openAccordion, setOpenAccordion] = useState<string | null>("details");
+  const [isAdding, setIsAdding] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
   const activeProductImage = product.images[activeImage] ?? product.images[0];
 
   // Use a placeholder base URL for social sharing
@@ -212,23 +214,35 @@ export default function ProductDetails({
 
             <div className="flex flex-col gap-3 mb-10">
               <HoverButton
-                onClick={() => addToCart(product, selectedSize)}
+                onClick={() => {
+                  setIsAdding(true);
+                  setTimeout(() => {
+                    addToCart(product, selectedSize);
+                    setIsAdding(false);
+                  }, 600);
+                }}
                 variant="primary"
                 size="lg"
                 className="w-full flex gap-3 rounded-md"
+                isLoading={isAdding}
               >
                 <IoBagOutline size={16} />
                 Add to Cart
               </HoverButton>
               <HoverButton
                 onClick={() => {
-                  addToCart(product, selectedSize);
-                  setIsCartOpen(false);
-                  router.push("/checkout");
+                  setIsBuying(true);
+                  setTimeout(() => {
+                    addToCart(product, selectedSize);
+                    setIsCartOpen(false);
+                    setIsBuying(false);
+                    router.push("/checkout");
+                  }, 800);
                 }}
                 variant="success"
                 size="lg"
                 className="w-full rounded-md"
+                isLoading={isBuying}
               >
                 Buy It Now
               </HoverButton>

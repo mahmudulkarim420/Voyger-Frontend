@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 };
 
 import { CartProvider } from "@/store/CartContext";
+import { GlobalLoader } from "@/components/ui/loaders/GlobalLoader";
 
 export default function RootLayout({
   children,
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${baskervville.variable} antialiased`}>
       <body className="min-h-screen flex flex-col">
+        <GlobalLoader />
         <CartProvider>{children}</CartProvider>
       </body>
     </html>

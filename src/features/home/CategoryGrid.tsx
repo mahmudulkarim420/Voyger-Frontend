@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
 const gridCategories = [
   {
@@ -54,7 +54,7 @@ export const CategoryGrid = () => {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {/* Label overlay */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#FCFAF6] px-6 py-2 rounded shadow-sm border border-[#D5C1B6]/50">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#FCFAF6] px-6 py-2 rounded-[2px] shadow-sm border border-[#D5C1B6]/50 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-lg group-hover:bg-white">
               <span className="text-[14px] font-medium text-gray-900 whitespace-nowrap tracking-wide">
                 {item.name}
               </span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import Link from "next/link";
 import { IoCloseOutline, IoTrashOutline, IoBagOutline } from "react-icons/io5";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";

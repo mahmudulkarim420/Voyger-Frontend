@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/formatters";
 import { IoHelpCircleOutline } from "react-icons/io5";
@@ -20,7 +20,17 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("sslcommerz");
   const [billingAddress, setBillingAddress] = useState("same");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const total = cartTotal + selectedShipping.price;
+
+  const handleCheckout = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      // alert("Order placed successfully");
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen w-full bg-[#FCFAF6]">
@@ -237,7 +247,13 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <HoverButton variant="primary" size="lg" className="w-full rounded-md mb-12">
+            <HoverButton
+              variant="primary"
+              size="lg"
+              className="w-full rounded-md mb-12"
+              isLoading={isLoading}
+              onClick={handleCheckout}
+            >
               Pay now
             </HoverButton>
           </div>

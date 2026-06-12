@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
 
 export const PromotionalBanners = () => {

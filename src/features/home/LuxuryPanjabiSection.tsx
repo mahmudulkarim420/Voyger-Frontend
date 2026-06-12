@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
 const luxuryProducts = [
   {
@@ -74,7 +74,7 @@ export const LuxuryPanjabiSection = () => {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-[#FCFAF6]/95 px-3 py-1.5 flex items-center gap-2 rounded-sm shadow-sm whitespace-nowrap">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-[#FCFAF6]/95 px-3 py-1.5 flex items-center gap-2 rounded-[2px] shadow-sm whitespace-nowrap transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-lg group-hover:bg-white">
               <span className="text-sm font-bold text-gray-900">{product.price}</span>
               <span className="text-xs text-gray-500 line-through">{product.oldPrice}</span>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import { FiPackage, FiChevronRight } from "react-icons/fi";
 import { HoverButton } from "@/components/ui/HoverButton";
 

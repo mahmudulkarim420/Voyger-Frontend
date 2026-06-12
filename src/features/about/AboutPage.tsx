@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import { BrandPillars } from "@/components/shared/BrandPillars";
 import { PageHero } from "@/components/shared/PageHero";
 import { FiCheck } from "react-icons/fi";

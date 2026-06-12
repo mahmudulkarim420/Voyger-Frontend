@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 import { useState, useEffect } from "react";
 
 const slides = [

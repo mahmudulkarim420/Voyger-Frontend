@@ -10,6 +10,7 @@ import { InspiredBySection } from "@/features/home/InspiredBySection";
 import { NewsletterSection } from "@/features/home/NewsletterSection";
 import { LuxuryPanjabiSection } from "@/features/home/LuxuryPanjabiSection";
 import { NewArrivalCarousel } from "@/features/home/NewArrivalCarousel";
+import { FadeIn } from "@/components/ui/FadeIn";
 
 export default function Home() {
   return (
@@ -18,16 +19,36 @@ export default function Home() {
       <div>
         <BannerCarousel />
         <CategoryBar />
-        <CategoryGrid />
-        <CasualShirtSection />
-        <NewArrivalCarousel />
-        <LuxuryPanjabiSection />
-        <CottonSolidShirtSection />
-        <CottonSolidCarousel />
-        <CasualDenimShirtSection />
-        <TailorFitFormalPantSection />
-        <InspiredBySection />
-        <NewsletterSection />
+        <FadeIn>
+          <CategoryGrid />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <CasualShirtSection />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <NewArrivalCarousel />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <LuxuryPanjabiSection />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <CottonSolidShirtSection />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <CottonSolidCarousel />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <CasualDenimShirtSection />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <TailorFitFormalPantSection />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <InspiredBySection />
+        </FadeIn>
+        <FadeIn delay={0.1}>
+          <NewsletterSection />
+        </FadeIn>
       </div>
     </div>
   );

@@ -1,8 +1,18 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { HoverButton } from "@/components/ui/HoverButton";
 
 export default function RegisterPage() {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 1500); // Fake API latency
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
@@ -10,13 +20,14 @@ export default function RegisterPage() {
         <p className="text-sm text-gray-500">Join VOYAGE for a premium shopping experience</p>
       </div>
 
-      <form className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-700">Full Name</label>
           <input
             type="text"
             placeholder="John Doe"
             className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
+            disabled={isLoading}
           />
         </div>
         <div className="space-y-1">
@@ -25,6 +36,7 @@ export default function RegisterPage() {
             type="email"
             placeholder="name@example.com"
             className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
+            disabled={isLoading}
           />
         </div>
         <div className="space-y-1">
@@ -33,9 +45,16 @@ export default function RegisterPage() {
             type="password"
             placeholder="••••••••"
             className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
+            disabled={isLoading}
           />
         </div>
-        <HoverButton variant="dark" size="lg" className="w-full rounded-xl">
+        <HoverButton
+          variant="dark"
+          size="lg"
+          className="w-full rounded-xl"
+          isLoading={isLoading}
+          type="submit"
+        >
           Create Account
         </HoverButton>
       </form>
