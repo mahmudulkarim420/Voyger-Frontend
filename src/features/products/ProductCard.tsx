@@ -28,7 +28,7 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
             alt={product.name}
             fill
             priority={priority}
-            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className={`object-cover transition duration-700 group-hover:scale-[1.035] ${
               secondaryImage ? "group-hover:opacity-0" : ""
             }`}
@@ -38,7 +38,7 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
               src={secondaryImage}
               alt={`${product.name} alternate view`}
               fill
-              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className="object-cover opacity-0 transition duration-700 group-hover:scale-[1.035] group-hover:opacity-100"
             />
           )}

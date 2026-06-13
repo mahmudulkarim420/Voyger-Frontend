@@ -40,7 +40,7 @@ export const CategoryGrid = () => {
   return (
     <section className="container-standard section-padding bg-[#FCFAF6]">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-        {gridCategories.map((item) => (
+        {gridCategories.map((item, index) => (
           <Link
             key={item.name}
             href={`/shop/${item.name.toLowerCase().replace(" ", "-")}`}
@@ -50,7 +50,8 @@ export const CategoryGrid = () => {
               src={item.image}
               alt={item.name}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={index < 4}
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 25vw"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {/* Label overlay - মোবাইলের জন্য ছোট করা হয়েছে */}
