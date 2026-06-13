@@ -1,21 +1,16 @@
 "use client";
 import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
 import {
   FiUser,
   FiSearch,
   FiChevronDown,
   FiX,
-  FiHome,
-  FiLogIn,
-  FiPackage,
-  FiGrid,
 } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { desktopNavigationGroups } from "@/data/navigation";
-import { isAccountRoute, quickAccessLinks } from "@/lib/navigation";
 import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
@@ -28,10 +23,8 @@ export const Navbar = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
-  const isOnAccountPage = isAccountRoute(pathname);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -102,9 +95,8 @@ export const Navbar = () => {
             <span className="text-xl text-black font-medium tracking-[0.2em] mt-1">VOYΛGE</span>
           </Link>
 
-          {/* --- SHOP dropdown (shown when NOT on account pages) --- */}
-          {!isOnAccountPage && (
-            <div className="group h-full flex items-center relative">
+          {/* --- SHOP dropdown (always shown) --- */}
+          <div className="group h-full flex items-center relative">
               <button
                 type="button"
                 className="hidden md:flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity mt-1"
@@ -147,37 +139,6 @@ export const Navbar = () => {
                 </div>
               </div>
             </div>
-          )}
-
-          {/* --- Quick Access links (shown ONLY on account pages) --- */}
-          {isOnAccountPage && (
-            <div className="flex items-center gap-1 h-full">
-              {[
-                { name: "Home", href: "/", icon: FiHome },
-                { name: "Profile", href: "/profile", icon: FiUser },
-                { name: "Orders", href: "/orders", icon: FiPackage },
-                { name: "Dashboard", href: "/dashboard", icon: FiGrid },
-              ].map((item) => {
-                const isActive =
-                  item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 ${
-                      isActive
-                        ? "bg-[#F4EBE4] text-[#B37068]"
-                        : "text-gray-600 hover:bg-gray-100 hover:text-black"
-                    }`}
-                  >
-                    <item.icon size={16} />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
         </div>
 
         {/* Middle Section: Search Bar */}
