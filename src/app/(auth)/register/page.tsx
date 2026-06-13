@@ -14,10 +14,38 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-md mx-auto space-y-6 pt-8 md:pt-0 relative">
+      
+      {/* Logo Section - গ্যারান্টিড টপ সেন্টার (মোবাইলে) */}
+      <div className="flex justify-center items-center w-full mb-6 md:mb-10">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="md:w-9 md:h-9"
+          >
+            <path
+              d="M4 10 L16 30 L28 10"
+              stroke="black"
+              strokeWidth="1.5"
+              strokeLinejoin="miter"
+            />
+            <path d="M16 2 L16 30" stroke="black" strokeWidth="1.5" />
+            <path d="M10 6 L10 20" stroke="black" strokeWidth="1.5" />
+            <path d="M22 6 L22 20" stroke="black" strokeWidth="1.5" />
+            <path d="M4 10 L10 10" stroke="black" strokeWidth="1.5" />
+            <path d="M22 10 L28 10" stroke="black" strokeWidth="1.5" />
+          </svg>
+          <span className="text-xl md:text-2xl text-black font-bold tracking-[0.2em] mt-1">VOYΛGE</span>
+        </Link>
+      </div>
+
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-black">Create Account</h1>
-        <p className="text-sm text-gray-500">Join VOYAGE for a premium shopping experience</p>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-black">Create Account</h1>
+        <p className="text-xs md:text-sm text-gray-500">Join VOYAGE for a premium shopping experience</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -51,7 +79,7 @@ export default function RegisterPage() {
         <HoverButton
           variant="dark"
           size="lg"
-          className="w-full rounded-xl"
+          className="w-full rounded-xl py-3.5"
           isLoading={isLoading}
           type="submit"
         >

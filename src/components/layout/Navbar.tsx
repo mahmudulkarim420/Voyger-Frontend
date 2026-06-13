@@ -1,11 +1,21 @@
 "use client";
 import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
-import { FiUser, FiSearch, FiChevronDown, FiX } from "react-icons/fi";
+import {
+  FiUser,
+  FiSearch,
+  FiChevronDown,
+  FiX,
+  FiHome,
+  FiLogIn,
+  FiPackage,
+  FiGrid,
+} from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { desktopNavigationGroups } from "@/data/navigation";
+import { isAccountRoute, quickAccessLinks } from "@/lib/navigation";
 import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
@@ -18,8 +28,10 @@ export const Navbar = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
+  const isOnAccountPage = isAccountRoute(pathname);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -90,49 +102,82 @@ export const Navbar = () => {
             <span className="text-xl text-black font-medium tracking-[0.2em] mt-1">VOYΛGE</span>
           </Link>
 
-          <div className="group h-full flex items-center relative">
-            <button
-              type="button"
-              className="hidden md:flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity mt-1"
-              aria-label="Open shop categories"
-            >
-              <span className="text-sm tracking-widest font-medium text-gray-900">SHOP</span>
-              <FiChevronDown
-                className="group-hover:rotate-180 transition-transform duration-300 text-black"
-                size={14}
-              />
-            </button>
+          {/* --- SHOP dropdown (shown when NOT on account pages) --- */}
+          {!isOnAccountPage && (
+            <div className="group h-full flex items-center relative">
+              <button
+                type="button"
+                className="hidden md:flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity mt-1"
+                aria-label="Open shop categories"
+              >
+                <span className="text-sm tracking-widest font-medium text-gray-900">SHOP</span>
+                <FiChevronDown
+                  className="group-hover:rotate-180 transition-transform duration-300 text-black"
+                  size={14}
+                />
+              </button>
 
-            {/* Dropdown Menu */}
-            <div className="fixed left-0 right-0 top-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 group-hover:translate-y-0 translate-y-2 z-50">
-              <div className="bg-[#FCFAF6] w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border-b border-gray-200/60 p-10 flex justify-center gap-16">
-                {desktopNavigationGroups.map((group) => {
-                  const category = group.categoryId ? categoriesById.get(group.categoryId) : null;
+              {/* Dropdown Menu */}
+              <div className="fixed left-0 right-0 top-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 group-hover:translate-y-0 translate-y-2 z-50">
+                <div className="bg-[#FCFAF6] w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border-b border-gray-200/60 p-10 flex justify-center gap-16">
+                  {desktopNavigationGroups.map((group) => {
+                    const category = group.categoryId ? categoriesById.get(group.categoryId) : null;
 
-                  return (
-                    <div key={group.name} className="flex flex-col gap-4">
-                      <Link
-                        href={group.href}
-                        className="font-semibold tracking-widest text-sm mb-2 text-gray-900 hover:text-[#B37068] transition-colors"
-                        aria-label={`Browse ${category?.name ?? group.name}`}
-                      >
-                        {group.name}
-                      </Link>
-                      {group.children?.map((item) => (
+                    return (
+                      <div key={group.name} className="flex flex-col gap-4">
                         <Link
-                          key={item.name}
-                          href={item.href}
-                          className="relative text-gray-600 hover:text-black text-sm transition-colors duration-300 ease-in-out pb-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
+                          href={group.href}
+                          className="font-semibold tracking-widest text-sm mb-2 text-gray-900 hover:text-[#B37068] transition-colors"
+                          aria-label={`Browse ${category?.name ?? group.name}`}
                         >
-                          {item.name}
+                          {group.name}
                         </Link>
-                      ))}
-                    </div>
-                  );
-                })}
+                        {group.children?.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className="relative text-gray-600 hover:text-black text-sm transition-colors duration-300 ease-in-out pb-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* --- Quick Access links (shown ONLY on account pages) --- */}
+          {isOnAccountPage && (
+            <div className="flex items-center gap-1 h-full">
+              {[
+                { name: "Home", href: "/", icon: FiHome },
+                { name: "Profile", href: "/profile", icon: FiUser },
+                { name: "Orders", href: "/orders", icon: FiPackage },
+                { name: "Dashboard", href: "/dashboard", icon: FiGrid },
+              ].map((item) => {
+                const isActive =
+                  item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium tracking-wide transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#F4EBE4] text-[#B37068]"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-black"
+                    }`}
+                  >
+                    <item.icon size={16} />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Middle Section: Search Bar */}

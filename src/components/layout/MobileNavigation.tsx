@@ -2,15 +2,12 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icons/bs";
+import { FiHome, FiLogIn, FiUser, FiPackage, FiGrid, FiChevronRight } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
-import {
-  bottomNavigation,
-  mobileNavigationGroups,
-  trendingSearches,
-  utilityNavigation,
-} from "@/data/navigation";
+import { bottomNavigation, mobileNavigationGroups, trendingSearches } from "@/data/navigation";
+import { isAccountRoute, quickAccessLinks } from "@/lib/navigation";
 import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
@@ -23,7 +20,9 @@ export const MobileNavigation = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
   const { cartCount, setIsCartOpen } = useCart();
+  const isOnAccountPage = isAccountRoute(pathname);
 
   const suggestions = useMemo(() => {
     if (searchQuery.trim().length <= 1) return [];
@@ -129,108 +128,156 @@ export const MobileNavigation = () => {
           }`}
         >
           <div className="mt-16 flex-1 overflow-y-auto no-scrollbar">
-            <h2 className="text-[11px] font-bold tracking-[0.3em] text-gray-400 mb-8 uppercase">
-              Collections
-            </h2>
+            {/* --- Collections (shown when NOT on account pages) --- */}
+            {!isOnAccountPage && (
+              <>
+                <h2 className="text-[11px] font-bold tracking-[0.3em] text-gray-400 mb-8 uppercase">
+                  Collections
+                </h2>
 
-            <div className="flex flex-col">
-              {mobileNavigationGroups.map((category) => {
-                const categoryDetails = category.categoryId
-                  ? categoriesById.get(category.categoryId)
-                  : null;
+                <div className="flex flex-col">
+                  {mobileNavigationGroups.map((category) => {
+                    const categoryDetails = category.categoryId
+                      ? categoriesById.get(category.categoryId)
+                      : null;
 
-                return (
-                  <div key={category.name} className="border-b border-gray-100/50 py-4">
-                    <div
-                      className="flex items-center justify-between cursor-pointer group"
-                      onClick={() =>
-                        category.children &&
-                        setActiveCategory(activeCategory === category.name ? null : category.name)
-                      }
-                    >
-                      <Link
-                        href={category.href}
-                        className="text-[14px] font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#B37068] transition-colors"
-                        aria-label={`Browse ${categoryDetails?.name ?? category.name}`}
-                        onClick={(e) => {
-                          if (category.children) {
-                            e.preventDefault(); // Don't navigate if there are subcategories, toggle them instead
-                          } else {
-                            setMenuOpen(false);
-                          }
-                        }}
-                      >
-                        {category.name}
-                      </Link>
-                      {category.children && (
+                    return (
+                      <div key={category.name} className="border-b border-gray-100/50 py-4">
                         <div
-                          className={`p-1.5 rounded-full bg-gray-50 transition-all duration-300 ${activeCategory === category.name ? "rotate-180 bg-[#F4EBE4] text-[#B37068]" : "text-gray-400"}`}
+                          className="flex items-center justify-between cursor-pointer group"
+                          onClick={() =>
+                            category.children &&
+                            setActiveCategory(
+                              activeCategory === category.name ? null : category.name,
+                            )
+                          }
                         >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
+                          <Link
+                            href={category.href}
+                            className="text-[14px] font-bold tracking-[0.2em] text-gray-900 group-hover:text-[#B37068] transition-colors"
+                            aria-label={`Browse ${categoryDetails?.name ?? category.name}`}
+                            onClick={(e) => {
+                              if (category.children) {
+                                e.preventDefault();
+                              } else {
+                                setMenuOpen(false);
+                              }
+                            }}
                           >
-                            <path d="m6 9 6 6 6-6" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Subcategories Accordion */}
-                    {category.children && (
-                      <div
-                        className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                          activeCategory === category.name
-                            ? "max-h-[500px] mt-2 opacity-100"
-                            : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        <div className="flex flex-col gap-1 py-2">
-                          {category.children.map((sub) => (
-                            <Link
-                              key={sub.name}
-                              href={sub.href}
-                              className="text-[14px] text-gray-600 hover:text-black py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-between group/sub"
-                              onClick={() => setMenuOpen(false)}
+                            {category.name}
+                          </Link>
+                          {category.children && (
+                            <div
+                              className={`p-1.5 rounded-full bg-gray-50 transition-all duration-300 ${activeCategory === category.name ? "rotate-180 bg-[#F4EBE4] text-[#B37068]" : "text-gray-400"}`}
                             >
-                              <span>{sub.name}</span>
                               <svg
-                                width="12"
-                                height="12"
+                                width="14"
+                                height="14"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                strokeWidth="2"
-                                className="opacity-0 -translate-x-2 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all"
+                                strokeWidth="2.5"
                               >
-                                <path d="m9 18 6-6-6-6" />
+                                <path d="m6 9 6 6 6-6" />
                               </svg>
-                            </Link>
-                          ))}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
 
-            {/* Additional Links */}
-            <div className="mt-12 space-y-6">
-              {utilityNavigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="block text-[13px] font-medium tracking-widest text-gray-500 uppercase hover:text-black transition-colors"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
+                        {/* Subcategories Accordion */}
+                        {category.children && (
+                          <div
+                            className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                              activeCategory === category.name
+                                ? "max-h-[500px] mt-2 opacity-100"
+                                : "max-h-0 opacity-0"
+                            }`}
+                          >
+                            <div className="flex flex-col gap-1 py-2">
+                              {category.children.map((sub) => (
+                                <Link
+                                  key={sub.name}
+                                  href={sub.href}
+                                  className="text-[14px] text-gray-600 hover:text-black py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-between group/sub"
+                                  onClick={() => setMenuOpen(false)}
+                                >
+                                  <span>{sub.name}</span>
+                                  <svg
+                                    width="12"
+                                    height="12"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    className="opacity-0 -translate-x-2 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all"
+                                  >
+                                    <path d="m9 18 6-6-6-6" />
+                                  </svg>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* --- Quick Access (shown ONLY on account pages) --- */}
+            {isOnAccountPage && (
+              <div className="mt-2">
+                <h2 className="text-[11px] font-bold tracking-[0.3em] text-gray-400 mb-5 uppercase">
+                  My Account
+                </h2>
+                <div className="flex flex-col gap-1">
+                  {[
+                    { name: "Home", href: "/", icon: FiHome },
+                    { name: "Sign In / Sign Up", href: "/login", icon: FiLogIn },
+                    { name: "Profile", href: "/profile", icon: FiUser },
+                    { name: "Orders", href: "/orders", icon: FiPackage },
+                    { name: "Dashboard", href: "/dashboard", icon: FiGrid },
+                  ].map((item) => {
+                    const isActive =
+                      item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`flex items-center justify-between py-3 px-3 rounded-lg text-[14px] font-medium transition-all group/link ${
+                          isActive
+                            ? "bg-[#F4EBE4] text-[#B37068]"
+                            : "text-gray-700 hover:bg-gray-50 hover:text-black"
+                        }`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <item.icon
+                            size={18}
+                            className={`transition-colors ${
+                              isActive
+                                ? "text-[#B37068]"
+                                : "text-gray-400 group-hover/link:text-[#B37068]"
+                            }`}
+                          />
+                          <span>{item.name}</span>
+                        </div>
+                        <FiChevronRight
+                          size={14}
+                          className={`transition-all ${
+                            isActive
+                              ? "text-[#B37068] opacity-100"
+                              : "text-gray-300 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0"
+                          }`}
+                        />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Social Links / Footer inside Sidebar */}
