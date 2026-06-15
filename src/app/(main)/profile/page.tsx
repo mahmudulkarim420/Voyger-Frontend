@@ -59,7 +59,7 @@ export default function ProfilePage() {
               {!isEditingProfile && (
                 <button
                   onClick={() => setIsEditingProfile(true)}
-                  className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
+                  className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 cursor-pointer"
                 >
                   <FiEdit2 size={16} /> <span className="text-sm font-medium">Edit</span>
                 </button>
@@ -97,7 +97,7 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div className="pt-2 flex gap-3">
-                  <HoverButton variant="primary" size="sm" onClick={handleSaveProfile} className="rounded-md">
+                  <HoverButton variant="primary" size="sm" onClick={handleSaveProfile} className="rounded-md cursor-pointer">
                     Save Changes
                   </HoverButton>
                   <HoverButton
@@ -107,7 +107,7 @@ export default function ProfilePage() {
                       setIsEditingProfile(false);
                       setEditUser(user);
                     }}
-                    className="rounded-md"
+                    className="rounded-md cursor-pointer"
                   >
                     Cancel
                   </HoverButton>
@@ -142,7 +142,7 @@ export default function ProfilePage() {
               {!isAddingAddress && (
                 <button
                   onClick={() => setIsAddingAddress(true)}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors cursor-pointer"
                 >
                   + Add New
                 </button>
@@ -185,14 +185,14 @@ export default function ProfilePage() {
                   </div>
                 </div>
                 <div className="pt-3 flex gap-3 ">
-                  <HoverButton variant="primary" size="sm" onClick={handleAddAddress} className="rounded-md">
+                  <HoverButton variant="primary" size="sm" onClick={handleAddAddress} className="rounded-md cursor-pointer">
                     Save Address
                   </HoverButton>
                   <HoverButton
                     variant="secondary"
                     size="sm"
                     onClick={() => setIsAddingAddress(false)}
-                    className="rounded-md"
+                    className="rounded-md cursor-pointer"
                   >
                     Cancel
                   </HoverButton>
@@ -234,10 +234,10 @@ export default function ProfilePage() {
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
-            <HoverButton variant="accent" size="md" className="rounded-lg">
+            <HoverButton variant="accent" size="md" className="rounded-lg cursor-pointer">
               Sign out
             </HoverButton>
-            <HoverButton variant="secondary" size="md" className="rounded-lg">
+            <HoverButton variant="secondary" size="md" className="rounded-lg cursor-pointer">
               Sign out of all devices
             </HoverButton>
           </div>

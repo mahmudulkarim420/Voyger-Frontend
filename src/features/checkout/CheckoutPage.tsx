@@ -257,7 +257,7 @@ export default function CheckoutPage() {
             <HoverButton
               variant="primary"
               size="lg"
-              className="w-full rounded-md mb-6 lg:mb-12 py-4"
+              className="w-full rounded-md mb-6 lg:mb-12 py-4 cursor-pointer"
               isLoading={isLoading}
               onClick={handleCheckout}
             >

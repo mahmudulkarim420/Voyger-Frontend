@@ -59,7 +59,7 @@ export const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage <= 1}
-        className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+        className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer"
         aria-label="Previous page"
       >
         <FiChevronLeft size={20} />
@@ -72,7 +72,7 @@ export const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
-        className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+        className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-30 disabled:hover:bg-transparent transition-all cursor-pointer"
         aria-label="Next page"
       >
         <FiChevronRight size={20} />

@@ -128,7 +128,7 @@ export default function ProductDetails({
                   key={`${product.id}-${img}-${idx}`}
                   onClick={() => setActiveImage(idx)}
                   aria-label={`Show ${product.name} image ${idx + 1}`}
-                  className={`w-32 aspect-[4/3] rounded-[1px] overflow-hidden border transition-all ${
+                  className={`w-32 aspect-[4/3] rounded-[1px] overflow-hidden border transition-all cursor-pointer ${
                     activeImage === idx
                       ? "border-[#A05C55]"
                       : "border-transparent opacity-60 hover:opacity-100"
@@ -178,7 +178,7 @@ export default function ProductDetails({
                     key={size}
                     onClick={() => setSelectedSize(size)}
                     aria-label={`Select size ${size}`}
-                    className={`w-9 h-8 flex items-center justify-center rounded-[1px] border text-xs font-bold transition-all ${
+                    className={`w-9 h-8 flex items-center justify-center rounded-[1px] border text-xs font-bold transition-all cursor-pointer ${
                       selectedSize === size
                         ? "bg-black text-white border-black"
                         : "border-gray-300 text-[#3A322B] hover:border-black"
@@ -194,7 +194,7 @@ export default function ProductDetails({
               <div className="inline-flex items-center border border-gray-200 bg-white/50 backdrop-blur-sm">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors border-r border-gray-100"
+                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors border-r border-gray-100 cursor-pointer"
                   aria-label="Decrease quantity"
                 >
                   <FaMinus size={8} />
@@ -204,7 +204,7 @@ export default function ProductDetails({
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors border-l border-gray-100"
+                  className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors border-l border-gray-100 cursor-pointer"
                   aria-label="Increase quantity"
                 >
                   <FaPlus size={8} />
@@ -223,7 +223,7 @@ export default function ProductDetails({
                 }}
                 variant="primary"
                 size="lg"
-                className="w-full flex gap-3 rounded-md"
+                className="w-full flex gap-3 rounded-md cursor-pointer"
                 isLoading={isAdding}
               >
                 <IoBagOutline size={16} />
@@ -241,7 +241,7 @@ export default function ProductDetails({
                 }}
                 variant="success"
                 size="lg"
-                className="w-full rounded-md"
+                className="w-full rounded-md cursor-pointer"
                 isLoading={isBuying}
               >
                 Buy It Now
@@ -255,7 +255,7 @@ export default function ProductDetails({
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-gray-900 transition-colors hover:text-[#A05C55]"
+                    className="text-gray-900 transition-colors hover:text-[#A05C55] cursor-pointer"
                     aria-label={`Share ${product.name} on ${item.name}`}
                     target={item.href.startsWith("http") ? "_blank" : undefined}
                     rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
@@ -293,7 +293,7 @@ export default function ProductDetails({
                     </span>
                     <FaChevronDown
                       size={10}
-                      className={`text-gray-400 transition-transform duration-500 ease-out ${
+                      className={`text-gray-400 transition-transform duration-500 ease-out cursor-pointer ${
                         openAccordion === section.id ? "rotate-180" : ""
                       }`}
                     />

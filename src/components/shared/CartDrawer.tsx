@@ -58,7 +58,7 @@ export const CartDrawer = () => {
           </div>
           <button
             onClick={handleClose}
-            className="hover:rotate-90 transition-transform duration-300"
+            className="hover:rotate-90 transition-transform duration-300 cursor-pointer"
             aria-label="Close cart"
           >
             <IoCloseOutline size={24} />
@@ -96,7 +96,7 @@ export const CartDrawer = () => {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1, item.selectedSize)
                           }
-                          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
                           aria-label="Decrease quantity"
                         >
                           <AiOutlineMinus size={10} />
@@ -108,7 +108,7 @@ export const CartDrawer = () => {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1, item.selectedSize)
                           }
-                          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
                           aria-label="Increase quantity"
                         >
                           <AiOutlinePlus size={10} />
@@ -118,7 +118,7 @@ export const CartDrawer = () => {
                       {/* Remove Button */}
                       <button
                         onClick={() => removeFromCart(item.id, item.selectedSize)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
+                        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                         aria-label="Remove item"
                       >
                         <IoTrashOutline size={18} />
@@ -138,7 +138,7 @@ export const CartDrawer = () => {
                 onClick={() => setIsCartOpen(false)}
                 variant="primary"
                 size="md"
-                className="rounded-[1px]"
+                className="rounded-[1px] cursor-pointer"
               >
                 Continue Shopping
               </HoverButton>
@@ -163,7 +163,7 @@ export const CartDrawer = () => {
                 size="lg"
                 href="/cart"
                 onClick={handleClose}
-                className="w-full rounded-[1px] border border-slate-900 uppercase tracking-[0.2em]"
+                className="w-full rounded-[1px] border border-slate-900 uppercase tracking-[0.2em] cursor-pointer"
               >
                 View Cart
               </HoverButton>
@@ -174,7 +174,7 @@ export const CartDrawer = () => {
                 size="lg"
                 href="/checkout"
                 onClick={handleClose}
-                className="w-full rounded-[1px] uppercase tracking-[0.2em]"
+                className="w-full rounded-[1px] uppercase tracking-[0.2em] cursor-pointer"
               >
                 Checkout
               </HoverButton>

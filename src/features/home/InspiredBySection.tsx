@@ -34,7 +34,7 @@ export const InspiredBySection = () => {
                 alt={person.name}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer"
               />
             </div>
             <div className="bg-[#F3E9E2]/50 px-6 py-2 rounded-md shadow-sm border border-[#D5C1B6]/30 transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-md group-hover:bg-white group-hover:border-[#D5C1B6]/50">

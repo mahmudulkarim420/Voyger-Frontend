@@ -256,7 +256,7 @@ export const Navbar = () => {
               className="hover:opacity-70 transition-opacity p-2"
               aria-label="Open account menu"
             >
-              <FiUser size={24} className="text-black" strokeWidth={1.5} />
+              <FiUser size={24} className="text-black cursor-pointer" strokeWidth={1.5} />
             </button>
 
             {/* Account Dropdown Menu */}
@@ -304,7 +304,7 @@ export const Navbar = () => {
             className="relative hover:opacity-70 transition-opacity p-2"
             aria-label="Open cart"
           >
-            <BsCart2 className="text-black" size={24} />
+            <BsCart2 className="text-black cursor-pointer" size={24} />
             {cartCount > 0 && (
               <span className="absolute -top-1.5 -right-2 bg-[#B37068] text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
                 {cartCount}

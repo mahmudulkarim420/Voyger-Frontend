@@ -23,7 +23,7 @@ export const NewsletterSection = () => {
             className="flex-1 px-6 py-4 bg-white border border-gray-200 focus:outline-none text-gray-700"
             required
           />
-          <Button className="px-10 rounded-none uppercase bg-[#B37068] tracking-widest">
+          <Button className="px-10 rounded-none uppercase bg-[#B37068] tracking-widest cursor-pointer">
             SUBSCRIBE
           </Button>
         </form>

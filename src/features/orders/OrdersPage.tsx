@@ -88,7 +88,7 @@ export default function OrdersPage() {
                     >
                       {order.status}
                     </span>
-                    <button className="p-2 text-gray-400 hover:text-black transition-colors flex items-center gap-1">
+                    <button className="p-2 text-gray-400 hover:text-black transition-colors flex items-center gap-1 cursor-pointer">
                       <span className="text-[11px] font-bold uppercase tracking-wide md:hidden text-gray-600">
                         View Details
                       </span>
@@ -130,7 +130,7 @@ export default function OrdersPage() {
                             variant="primary" 
                             size="sm" 
                             /* মোবাইলে প্যাডিং ও টেক্সট সাইজ ছোট করা হয়েছে: px-3 py-1.5 text-[10px] */
-                            className="whitespace-nowrap rounded-md px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-sm"
+                            className="whitespace-nowrap rounded-md px-3 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-sm cursor-pointer"
                           >
                             Buy it again
                           </HoverButton>

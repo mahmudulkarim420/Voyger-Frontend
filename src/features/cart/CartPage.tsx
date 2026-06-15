@@ -69,7 +69,7 @@ export default function CartPage() {
                         onClick={() =>
                           updateQuantity(item.id, item.quantity - 1, item.selectedSize)
                         }
-                        className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
+                        className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
                         aria-label="Decrease quantity"
                       >
                         <AiOutlineMinus size={12} />
@@ -81,7 +81,7 @@ export default function CartPage() {
                         onClick={() =>
                           updateQuantity(item.id, item.quantity + 1, item.selectedSize)
                         }
-                        className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors"
+                        className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-black transition-colors cursor-pointer"
                         aria-label="Increase quantity"
                       >
                         <AiOutlinePlus size={12} />
@@ -89,7 +89,7 @@ export default function CartPage() {
                     </div>
                     <button
                       onClick={() => removeFromCart(item.id, item.selectedSize)}
-                      className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                      className="text-gray-400 hover:text-red-500 transition-colors p-2 cursor-pointer"
                       aria-label="Remove item"
                     >
                       <IoTrashOutline size={20} />
@@ -123,7 +123,7 @@ export default function CartPage() {
                 <HoverButton
                   variant="primary"
                   size="lg"
-                  className="w-full rounded-[1px] uppercase tracking-[0.2em]"
+                  className="w-full rounded-[1px] uppercase tracking-[0.2em] cursor-pointer"
                 >
                   Check out
                 </HoverButton>
@@ -137,7 +137,7 @@ export default function CartPage() {
               <HoverButton
                 variant="primary"
                 size="lg"
-                className="px-12 rounded-[1px] uppercase tracking-[0.2em]"
+                className="px-12 rounded-[1px] uppercase tracking-[0.2em] cursor-pointer"
               >
                 Continue shopping
               </HoverButton>

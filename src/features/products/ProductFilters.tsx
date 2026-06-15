@@ -97,7 +97,7 @@ export const ProductFilters = () => {
               </div>
               <button
                 type="submit"
-                className="bg-[#B37068] hover:bg-[#9c6059] text-white px-4 lg:px-6 py-2.5 lg:py-3 rounded-r-xl text-sm font-medium transition-colors"
+                className="bg-[#B37068] hover:bg-[#9c6059] text-white px-4 lg:px-6 py-2.5 lg:py-3 rounded-r-xl text-sm font-medium transition-colors cursor-pointer"
               >
                 Search
               </button>
