@@ -29,20 +29,8 @@ export const ProductCard = ({ product, priority = false, className = "" }: Produ
             fill
             priority={priority}
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className={`object-cover transition duration-700 group-hover:scale-[1.035] ${
-              secondaryImage ? "group-hover:opacity-0" : ""
-            }`}
+            className="object-cover transition duration-700 group-hover:scale-[1.035]"
           />
-          {secondaryImage && (
-            <Image
-              src={secondaryImage}
-              alt={`${product.name} alternate view`}
-              fill
-              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover opacity-0 transition duration-700 group-hover:scale-[1.035] group-hover:opacity-100"
-            />
-          )}
-
 
           {(isSoldOut || isLowStock) && (
             <span className="absolute left-3 top-3 bg-[#FCFAF6]/95 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#3A322B] shadow-sm">
