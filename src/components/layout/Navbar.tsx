@@ -3,18 +3,14 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
-import {
-  FiUser,
-  FiSearch,
-  FiChevronDown,
-  FiX,
-} from "react-icons/fi";
+import { FiUser, FiSearch, FiChevronDown, FiX } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { desktopNavigationGroups } from "@/data/navigation";
 import { useCart } from "@/hooks/useCart";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
+import { useSession, signOut } from "@/lib/auth-client";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 
@@ -25,6 +21,12 @@ export const Navbar = () => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
+  const { data: session, isPending } = useSession();
+
+  const handleLogout = async () => {
+    await signOut();
+    router.push("/login");
+  };
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -97,48 +99,48 @@ export const Navbar = () => {
 
           {/* --- SHOP dropdown (always shown) --- */}
           <div className="group h-full flex items-center relative">
-              <button
-                type="button"
-                className="hidden md:flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity mt-1"
-                aria-label="Open shop categories"
-              >
-                <span className="text-sm tracking-widest font-medium text-gray-900">SHOP</span>
-                <FiChevronDown
-                  className="group-hover:rotate-180 transition-transform duration-300 text-black"
-                  size={14}
-                />
-              </button>
+            <button
+              type="button"
+              className="hidden md:flex items-center gap-1.5 cursor-pointer hover:opacity-70 transition-opacity mt-1"
+              aria-label="Open shop categories"
+            >
+              <span className="text-sm tracking-widest font-medium text-gray-900">SHOP</span>
+              <FiChevronDown
+                className="group-hover:rotate-180 transition-transform duration-300 text-black"
+                size={14}
+              />
+            </button>
 
-              {/* Dropdown Menu */}
-              <div className="fixed left-0 right-0 top-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 group-hover:translate-y-0 translate-y-2 z-50">
-                <div className="bg-[#FCFAF6] w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border-b border-gray-200/60 p-10 flex justify-center gap-16">
-                  {desktopNavigationGroups.map((group) => {
-                    const category = group.categoryId ? categoriesById.get(group.categoryId) : null;
+            {/* Dropdown Menu */}
+            <div className="fixed left-0 right-0 top-20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-500 group-hover:translate-y-0 translate-y-2 z-50">
+              <div className="bg-[#FCFAF6] w-full shadow-[0_20px_50px_-15px_rgba(0,0,0,0.15)] border-b border-gray-200/60 p-10 flex justify-center gap-16">
+                {desktopNavigationGroups.map((group) => {
+                  const category = group.categoryId ? categoriesById.get(group.categoryId) : null;
 
-                    return (
-                      <div key={group.name} className="flex flex-col gap-4">
+                  return (
+                    <div key={group.name} className="flex flex-col gap-4">
+                      <Link
+                        href={group.href}
+                        className="font-semibold tracking-widest text-sm mb-2 text-gray-900 hover:text-[#B37068] transition-colors"
+                        aria-label={`Browse ${category?.name ?? group.name}`}
+                      >
+                        {group.name}
+                      </Link>
+                      {group.children?.map((item) => (
                         <Link
-                          href={group.href}
-                          className="font-semibold tracking-widest text-sm mb-2 text-gray-900 hover:text-[#B37068] transition-colors"
-                          aria-label={`Browse ${category?.name ?? group.name}`}
+                          key={item.name}
+                          href={item.href}
+                          className="relative text-gray-600 hover:text-black text-sm transition-colors duration-300 ease-in-out pb-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
                         >
-                          {group.name}
+                          {item.name}
                         </Link>
-                        {group.children?.map((item) => (
-                          <Link
-                            key={item.name}
-                            href={item.href}
-                            className="relative text-gray-600 hover:text-black text-sm transition-colors duration-300 ease-in-out pb-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 after:ease-in-out hover:after:w-full"
-                          >
-                            {item.name}
-                          </Link>
-                        ))}
-                      </div>
-                    );
-                  })}
-                </div>
+                      ))}
+                    </div>
+                  );
+                })}
               </div>
             </div>
+          </div>
         </div>
 
         {/* Middle Section: Search Bar */}
@@ -250,54 +252,86 @@ export const Navbar = () => {
 
         {/* Right Section: Icons */}
         <div className="flex items-center gap-6">
-          <div className="relative group">
-            <button
-              onClick={() => setShowAccountMenu(!showAccountMenu)}
-              className="hover:opacity-70 transition-opacity p-2"
-              aria-label="Open account menu"
-            >
-              <FiUser size={24} className="text-black cursor-pointer" strokeWidth={1.5} />
-            </button>
-
-            {/* Account Dropdown Menu */}
-            <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 py-2">
-              <Link
-                href="/login"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                aria-label="Go to login page"
-              >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                aria-label="Go to registration page"
-              >
-                Create Account
-              </Link>
-              <Link
-                href="/profile"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                aria-label="Go to profile page"
-              >
-                Profile
-              </Link>
-              <Link
-                href="/orders"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                aria-label="Go to orders page"
-              >
-                Orders
-              </Link>
-              <hr className="my-2" />
+          {isPending ? (
+            <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+          ) : session ? (
+            <div className="relative group">
               <button
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => setShowAccountMenu(!showAccountMenu)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity p-1"
+                aria-label="Open account menu"
               >
-                Dashboard
+                {session.user.image ? (
+                  <img
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-[#B37068] text-white flex items-center justify-center font-bold text-sm">
+                    {session.user.name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                )}
               </button>
+
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 py-2">
+                <div className="px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-medium text-gray-900 truncate">{session.user.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+                </div>
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Profile
+                </Link>
+                <Link
+                  href="/orders"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Orders
+                </Link>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  Dashboard
+                </button>
+                <hr className="my-2" />
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="relative group">
+              <button
+                onClick={() => setShowAccountMenu(!showAccountMenu)}
+                className="hover:opacity-70 transition-opacity p-2"
+                aria-label="Open account menu"
+              >
+                <FiUser size={24} className="text-black cursor-pointer" strokeWidth={1.5} />
+              </button>
+
+              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 py-2">
+                <Link
+                  href="/login"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Create Account
+                </Link>
+              </div>
+            </div>
+          )}
 
           <button
             onClick={() => setIsCartOpen(true)}
