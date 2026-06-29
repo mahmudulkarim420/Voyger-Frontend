@@ -3,20 +3,26 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { HoverButton } from "@/components/ui/HoverButton";
-import { signIn } from "@/lib/auth-client";
+import { signIn, useSession } from "@/lib/auth-client";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // If the user is already authenticated, send them to home instead of
+  // letting them sit on the login screen.
+  useEffect(() => {
+    if (isMounted && !isPending && session) {
+      router.replace("/");
+    }
+  }, [isMounted, isPending, session, router]);
 
   if (!isMounted) {
     return (
@@ -27,27 +33,20 @@ export default function LoginPage() {
         <div className="space-y-4 pt-4">
           <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
           <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
-          <div className="h-12 bg-gray-200 rounded-xl animate-pulse" />
         </div>
       </div>
     );
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-    const { data, error: signInError } = await signIn.email({
-      email,
-      password,
-    });
-    if (signInError) {
-      setError(signInError.message || "Failed to sign in");
-      setIsLoading(false);
-    } else {
-      router.push("/");
-      // Keep isLoading true while redirecting
+  // Build an absolute callback URL so the Better Auth backend (which runs on a
+  // different origin than the Next.js frontend) redirects back to the frontend
+  // after the OAuth flow completes. A relative path like "/" would be resolved
+  // against the backend's origin, sending users to the wrong host.
+  const getCallbackURL = () => {
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}/`;
     }
+    return "/";
   };
 
   const handleGoogleSignIn = async () => {
@@ -55,13 +54,12 @@ export default function LoginPage() {
     setError(null);
     const { data, error: signInError } = await signIn.social({
       provider: "google",
-      callbackURL: "http://localhost:3000/",
+      callbackURL: getCallbackURL(),
     });
     if (signInError) {
       setError(signInError.message || "Failed to sign in with Google");
       setIsLoading(false);
     }
-    // Social sign-in typically handles its own redirect via the backend URL flow.
   };
 
   const handleFacebookSignIn = async () => {
@@ -69,7 +67,7 @@ export default function LoginPage() {
     setError(null);
     const { data, error: signInError } = await signIn.social({
       provider: "facebook",
-      callbackURL: "http://localhost:3000/",
+      callbackURL: getCallbackURL(),
     });
     if (signInError) {
       setError(signInError.message || "Failed to sign in with Facebook");
@@ -79,7 +77,7 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-md mx-auto space-y-6 pt-8 md:pt-0 relative">
-      {/* Logo Section - গ্যারান্টিড টপ সেন্টার (মোবাইলে) */}
+      {/* Logo */}
       <div className="flex justify-center items-center w-full mb-6 md:mb-10">
         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           <svg
@@ -106,59 +104,15 @@ export default function LoginPage() {
       <div className="text-center space-y-2">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-black">Welcome Back</h1>
         <p className="text-xs md:text-sm text-gray-500">
-          Enter your credentials to access your account
+          Sign in with your social account to continue
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="p-3 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm">
-            {error}
-          </div>
-        )}
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-700">Email Address</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@example.com"
-            required
-            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
-            disabled={isLoading}
-          />
+      {error && (
+        <div className="p-3 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm">
+          {error}
         </div>
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-gray-700">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-            className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-black focus:bg-white focus:ring-2 focus:ring-black/5 outline-none transition-all placeholder:text-gray-500"
-            disabled={isLoading}
-          />
-        </div>
-        <HoverButton
-          variant="dark"
-          size="lg"
-          className="w-full rounded-xl"
-          isLoading={isLoading}
-          type="submit"
-        >
-          {isLoading ? "Signing In..." : "Sign In"}
-        </HoverButton>
-      </form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">Or continue with</span>
-        </div>
-      </div>
+      )}
 
       <div className="space-y-3">
         <button
@@ -202,10 +156,14 @@ export default function LoginPage() {
       </div>
 
       <div className="text-center">
-        <p className="text-sm text-gray-500">
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-black font-semibold hover:underline">
-            Create account
+        <p className="text-xs text-gray-400">
+          By continuing, you agree to our{" "}
+          <Link href="/terms-of-service" className="underline hover:text-gray-600">
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link href="/privacy-policy" className="underline hover:text-gray-600">
+            Privacy Policy
           </Link>
         </p>
       </div>
