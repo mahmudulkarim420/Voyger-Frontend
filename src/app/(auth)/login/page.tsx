@@ -38,15 +38,12 @@ export default function LoginPage() {
     );
   }
 
-  // Build an absolute callback URL so the Better Auth backend (which runs on a
-  // different origin than the Next.js frontend) redirects back to the frontend
-  // after the OAuth flow completes. A relative path like "/" would be resolved
-  // against the backend's origin, sending users to the wrong host.
+  // Build an absolute callback URL without the trailing slash
   const getCallbackURL = () => {
     if (typeof window !== "undefined") {
-      return `${window.location.origin}/`;
+      return window.location.origin;
     }
-    return "/";
+    return "https://voyger-frontend.vercel.app";
   };
 
   const handleGoogleSignIn = async () => {
