@@ -4,11 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icons/bs";
-import { FiHome, FiLogIn, FiUser, FiPackage, FiGrid, FiChevronRight } from "react-icons/fi";
+import { FiHome, FiLogIn, FiUser, FiPackage, FiGrid, FiChevronRight, FiLogOut } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { bottomNavigation, mobileNavigationGroups, trendingSearches } from "@/data/navigation";
-import { isAccountRoute, quickAccessLinks } from "@/lib/navigation";
+import { isAccountRoute } from "@/lib/navigation";
 import { useCart } from "@/hooks/useCart";
+import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
@@ -22,6 +23,8 @@ export const MobileNavigation = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { cartCount, setIsCartOpen } = useCart();
+  const { isAuthenticated, isPending } = useAuthCheck();
+  const { signOutNow } = useSignOut("/");
   const isOnAccountPage = isAccountRoute(pathname);
 
   const suggestions = useMemo(() => {
@@ -232,49 +235,68 @@ export const MobileNavigation = () => {
                   My Account
                 </h2>
                 <div className="flex flex-col gap-1">
-                  {[
-                    { name: "Home", href: "/", icon: FiHome },
-                    { name: "Sign In / Sign Up", href: "/login", icon: FiLogIn },
-                    { name: "Profile", href: "/profile", icon: FiUser },
-                    { name: "Orders", href: "/orders", icon: FiPackage },
-                    { name: "Dashboard", href: "/dashboard", icon: FiGrid },
-                  ].map((item) => {
-                    const isActive =
-                      item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+                  {/* Always-available: Home */}
+                  <MobileAccountLink
+                    name="Home"
+                    href="/"
+                    icon={FiHome}
+                    pathname={pathname}
+                    onClick={() => setMenuOpen(false)}
+                  />
 
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className={`flex items-center justify-between py-3 px-3 rounded-lg text-[14px] font-medium transition-all group/link ${
-                          isActive
-                            ? "bg-[#F4EBE4] text-[#B37068]"
-                            : "text-gray-700 hover:bg-gray-50 hover:text-black"
-                        }`}
+                  {/* Session-aware links */}
+                  {isPending ? null : isAuthenticated ? (
+                    <>
+                      <MobileAccountLink
+                        name="Profile"
+                        href="/profile"
+                        icon={FiUser}
+                        pathname={pathname}
                         onClick={() => setMenuOpen(false)}
+                      />
+                      <MobileAccountLink
+                        name="Orders"
+                        href="/orders"
+                        icon={FiPackage}
+                        pathname={pathname}
+                        onClick={() => setMenuOpen(false)}
+                      />
+                      <MobileAccountLink
+                        name="Dashboard"
+                        href="/dashboard"
+                        icon={FiGrid}
+                        pathname={pathname}
+                        onClick={() => setMenuOpen(false)}
+                      />
+                      <button
+                        onClick={() => {
+                          setMenuOpen(false);
+                          signOutNow();
+                        }}
+                        className="flex items-center justify-between py-3 px-3 rounded-lg text-[14px] font-medium transition-all group/link text-red-600 hover:bg-red-50"
                       >
                         <div className="flex items-center gap-3">
-                          <item.icon
+                          <FiLogOut
                             size={18}
-                            className={`transition-colors ${
-                              isActive
-                                ? "text-[#B37068]"
-                                : "text-gray-400 group-hover/link:text-[#B37068]"
-                            }`}
+                            className="text-red-500 group-hover/link:text-red-600 transition-colors"
                           />
-                          <span>{item.name}</span>
+                          <span>Sign Out</span>
                         </div>
                         <FiChevronRight
                           size={14}
-                          className={`transition-all ${
-                            isActive
-                              ? "text-[#B37068] opacity-100"
-                              : "text-gray-300 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0"
-                          }`}
+                          className="text-red-300 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all"
                         />
-                      </Link>
-                    );
-                  })}
+                      </button>
+                    </>
+                  ) : (
+                    <MobileAccountLink
+                      name="Login"
+                      href="/login"
+                      icon={FiLogIn}
+                      pathname={pathname}
+                      onClick={() => setMenuOpen(false)}
+                    />
+                  )}
                 </div>
               </div>
             )}
@@ -488,3 +510,52 @@ export const MobileNavigation = () => {
     </>
   );
 };
+
+/** A single session-aware link inside the mobile "My Account" list. */
+function MobileAccountLink({
+  name,
+  href,
+  icon: Icon,
+  pathname,
+  onClick,
+}: {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  pathname: string;
+  onClick: () => void;
+}) {
+  const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  return (
+    <Link
+      href={href}
+      className={`flex items-center justify-between py-3 px-3 rounded-lg text-[14px] font-medium transition-all group/link ${
+        isActive
+          ? "bg-[#F4EBE4] text-[#B37068]"
+          : "text-gray-700 hover:bg-gray-50 hover:text-black"
+      }`}
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-3">
+        <Icon
+          size={18}
+          className={`transition-colors ${
+            isActive
+              ? "text-[#B37068]"
+              : "text-gray-400 group-hover/link:text-[#B37068]"
+          }`}
+        />
+        <span>{name}</span>
+      </div>
+      <FiChevronRight
+        size={14}
+        className={`transition-all ${
+          isActive
+            ? "text-[#B37068] opacity-100"
+            : "text-gray-300 opacity-0 -translate-x-1 group-hover/link:opacity-100 group-hover/link:translate-x-0"
+        }`}
+      />
+    </Link>
+  );
+}

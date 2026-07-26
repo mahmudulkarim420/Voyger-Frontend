@@ -1,246 +1,292 @@
 "use client";
 
-import React, { useState } from "react";
-import { FiEdit2, FiInfo, FiTrash2 } from "react-icons/fi";
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  FiAlertTriangle,
+  FiArrowRight,
+  FiLogOut,
+  FiMail,
+  FiShield,
+  FiUser,
+} from "react-icons/fi";
 import { HoverButton } from "@/components/ui/HoverButton";
+import { Skeleton } from "@/components/ui/loaders/Skeleton";
+import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
 
-interface Address {
-  id: string;
-  street: string;
-  city: string;
-  postalCode: string;
+/** Maps a raw backend role string to a display label + styling. */
+function getRoleBadge(role: string | undefined) {
+  if (!role) return null;
+
+  const normalized = role.toLowerCase();
+  if (normalized === "admin") {
+    return { label: "Admin", className: "bg-black text-white" };
+  }
+  // Default to "User" for any non-admin role the backend may return.
+  return { label: "User", className: "bg-gray-100 text-gray-700" };
 }
 
 export default function ProfilePage() {
-  const [user, setUser] = useState({
-    name: "M K Naiem",
-    email: "mknaiem998@gmail.com",
-    phone: "+880 1234 567890",
-  });
+  const router = useRouter();
+  const {
+    user,
+    isPending,
+    isAuthenticated,
+    role,
+    requiresDeviceManagement,
+  } = useAuthCheck();
+  const { signOutNow, isSigningOut } = useSignOut("/");
 
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [editUser, setEditUser] = useState(user);
+  // While the session is still resolving, show a structured skeleton so the
+  // layout never collapses into an empty screen.
+  if (isPending) {
+    return <ProfileSkeleton />;
+  }
 
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [isAddingAddress, setIsAddingAddress] = useState(false);
-  const [newAddress, setNewAddress] = useState<Omit<Address, "id">>({
-    street: "",
-    city: "",
-    postalCode: "",
-  });
+  // If the session resolved but there is no user, bounce to the login page.
+  // (The middleware also guards this, but we keep the client guard for safety.)
+  if (!isAuthenticated || !user) {
+    router.replace("/login");
+    return <ProfileSkeleton />;
+  }
 
-  const handleSaveProfile = () => {
-    setUser(editUser);
-    setIsEditingProfile(false);
-  };
-
-  const handleAddAddress = () => {
-    if (newAddress.street && newAddress.city) {
-      setAddresses([...addresses, { ...newAddress, id: Date.now().toString() }]);
-      setNewAddress({ street: "", city: "", postalCode: "" });
-      setIsAddingAddress(false);
-    }
-  };
-
-  const handleDeleteAddress = (id: string) => {
-    setAddresses(addresses.filter((a) => a.id !== id));
-  };
+  const roleBadge = getRoleBadge(role);
+  const displayName = user.name?.trim() || "VOYΛGE Member";
+  const initials = (user.name?.trim()?.[0] ?? "V").toUpperCase();
 
   return (
     <div className="bg-[#FCFAF6] min-h-screen">
-      <div className="container mx-auto px-4 lg:px-12 py-12 max-w-7xl">
-        <h1 className="text-2xl font-bold text-black mb-8">Profile</h1>
+      <div className="container mx-auto px-4 lg:px-12 py-10 md:py-16 max-w-3xl">
+        {/* Page heading */}
+        <div className="mb-8 md:mb-12">
+          <p className="text-[11px] font-bold tracking-[0.3em] text-gray-400 uppercase mb-2">
+            Account
+          </p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-black">
+            Profile
+          </h1>
+        </div>
 
         <div className="space-y-6">
-          {/* Personal Info Card */}
-          <div className="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-black">Personal Information</h2>
-              {!isEditingProfile && (
-                <button
-                  onClick={() => setIsEditingProfile(true)}
-                  className="text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 cursor-pointer"
-                >
-                  <FiEdit2 size={16} /> <span className="text-sm font-medium">Edit</span>
-                </button>
-              )}
-            </div>
-
-            {isEditingProfile ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-400 font-medium block mb-1">Name</label>
-                  <input
-                    type="text"
-                    value={editUser.name}
-                    onChange={(e) => setEditUser({ ...editUser, name: e.target.value })}
-                    className="w-full border border-gray-200 text-black rounded-lg px-4 py-2 focus:outline-none focus:border-black transition-colors placeholder:text-gray-500"
-                  />
+          {/* Security / Device Management alert */}
+          {requiresDeviceManagement && (
+            <div className="rounded-2xl border border-red-200 bg-red-50/70 p-5 md:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                  <FiAlertTriangle size={20} />
                 </div>
-                <div>
-                  <label className="text-sm text-gray-400 font-medium block mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={editUser.email}
-                    disabled
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2 bg-gray-50 text-gray-500 cursor-not-allowed focus:outline-none"
-                  />
-                  <p className="text-xs text-gray-400 mt-1">Email cannot be changed.</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 font-medium block mb-1">Phone</label>
-                  <input
-                    type="text"
-                    value={editUser.phone}
-                    onChange={(e) => setEditUser({ ...editUser, phone: e.target.value })}
-                    className="w-full border border-gray-200 text-black rounded-lg px-4 py-2 focus:outline-none focus:border-black transition-colors placeholder:text-gray-500"
-                  />
-                </div>
-                <div className="pt-2 flex gap-3">
-                  <HoverButton variant="primary" size="sm" onClick={handleSaveProfile} className="rounded-md cursor-pointer">
-                    Save Changes
-                  </HoverButton>
-                  <HoverButton
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => {
-                      setIsEditingProfile(false);
-                      setEditUser(user);
-                    }}
-                    className="rounded-md cursor-pointer"
+                <div className="flex-1">
+                  <h2 className="text-base font-bold text-red-700">
+                    Device limit reached
+                  </h2>
+                  <p className="mt-1 text-sm text-red-600/90 leading-relaxed">
+                    Your account is active on too many devices. Please sign out
+                    of at least one other device to continue using VOYΛGE
+                    securely.
+                  </p>
+                  <Link
+                    href="/device-limit"
+                    className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:text-red-800 transition-colors"
                   >
-                    Cancel
-                  </HoverButton>
+                    Manage devices
+                    <FiArrowRight size={14} />
+                  </Link>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-6 flex flex-col sm:flex-row sm:gap-12 sm:space-y-0">
-                <div className="flex-1">
-                  <span className="text-sm text-gray-400 font-medium block mb-1">Name</span>
-                  <span className="text-sm text-gray-800 font-medium">
-                    {user.name || "Not set"}
-                  </span>
+            </div>
+          )}
+
+          {/* Identity card */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
+              {/* Avatar */}
+              {user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.image}
+                  alt={displayName}
+                  className="h-16 w-16 rounded-full object-cover border border-gray-200"
+                />
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-black text-white text-xl font-bold">
+                  {initials}
                 </div>
-                <div className="flex-1">
-                  <span className="text-sm text-gray-400 font-medium block mb-1">Email</span>
-                  <span className="text-sm text-gray-800 font-medium">{user.email}</span>
+              )}
+
+              {/* Name + role badge */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h2 className="text-lg font-bold text-black truncate">
+                    {displayName}
+                  </h2>
+                  {roleBadge && (
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider ${roleBadge.className}`}
+                    >
+                      <FiShield size={11} />
+                      {roleBadge.label}
+                    </span>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <span className="text-sm text-gray-400 font-medium block mb-1">Phone</span>
-                  <span className="text-sm text-gray-800 font-medium">
-                    {user.phone || "Not set"}
-                  </span>
-                </div>
+                <p className="mt-1 text-sm text-gray-500 truncate">
+                  {user.email}
+                </p>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Addresses Card */}
-          <div className="bg-white rounded-xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100/50">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-black">Addresses</h2>
-              {!isAddingAddress && (
-                <button
-                  onClick={() => setIsAddingAddress(true)}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors cursor-pointer"
-                >
-                  + Add New
-                </button>
-              )}
-            </div>
+          {/* Details grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <DetailCard
+              icon={<FiUser size={16} />}
+              label="Name"
+              value={displayName}
+            />
+            <DetailCard
+              icon={<FiMail size={16} />}
+              label="Email"
+              value={user.email}
+              mono
+            />
+          </div>
 
-            {isAddingAddress && (
-              <div className="bg-gray-50/50 p-6 rounded-xl border border-gray-100 mb-6 space-y-4">
-                <h3 className="text-sm font-bold text-gray-800">New Address</h3>
-                <div>
-                  <label className="text-xs text-gray-500 block mb-1">Street Address</label>
-                  <input
-                    type="text"
-                    value={newAddress.street}
-                    onChange={(e) => setNewAddress({ ...newAddress, street: e.target.value })}
-                    placeholder="e.g. 123 Main St, Apt 4B"
-                    className="w-full border border-gray-200 text-black rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors bg-white placeholder:text-gray-500"
-                  />
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex-1">
-                    <label className="text-xs text-gray-500 block mb-1">City</label>
-                    <input
-                      type="text"
-                      value={newAddress.city}
-                      onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-                      placeholder="e.g. Dhaka"
-                      className="w-full border border-gray-200 text-black rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors bg-white placeholder:text-gray-500"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-xs text-gray-500 block mb-1">Postal Code</label>
-                    <input
-                      type="text"
-                      value={newAddress.postalCode}
-                      onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
-                      placeholder="e.g. 1200"
-                      className="w-full border border-gray-200 text-black rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-black transition-colors bg-white placeholder:text-gray-500"
-                    />
-                  </div>
-                </div>
-                <div className="pt-3 flex gap-3 ">
-                  <HoverButton variant="primary" size="sm" onClick={handleAddAddress} className="rounded-md cursor-pointer">
-                    Save Address
-                  </HoverButton>
-                  <HoverButton
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setIsAddingAddress(false)}
-                    className="rounded-md cursor-pointer"
-                  >
-                    Cancel
-                  </HoverButton>
-                </div>
-              </div>
-            )}
-
-            {addresses.length === 0 ? (
-              <div className="bg-gray-50/50 rounded-xl p-6 flex items-center justify-center gap-3 border border-dashed border-gray-200">
-                <FiInfo className="text-gray-400" size={18} />
-                <span className="text-sm text-gray-500">No addresses added yet</span>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {addresses.map((address) => (
-                  <div
-                    key={address.id}
-                    className="border border-gray-100 bg-white rounded-xl p-5 flex justify-between items-start shadow-sm transition-shadow hover:shadow-md"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 mb-1">{address.street}</p>
-                      <p className="text-xs text-gray-500">
-                        {address.city}
-                        {address.postalCode ? `, ${address.postalCode}` : ""}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteAddress(address.id)}
-                      className="text-gray-400 hover:text-red-500 p-1.5 rounded-md hover:bg-red-50 transition-colors"
-                      title="Delete address"
-                    >
-                      <FiTrash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
+          {/* Account meta */}
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+            <h3 className="text-sm font-bold tracking-widest text-gray-400 uppercase mb-4">
+              Account
+            </h3>
+            <dl className="divide-y divide-gray-100">
+              <MetaRow label="User ID" value={user.id} mono />
+              <MetaRow
+                label="Role"
+                value={roleBadge ? roleBadge.label : "—"}
+              />
+              <MetaRow
+                label="Device management"
+                value={requiresDeviceManagement ? "Required" : "All clear"}
+                tone={requiresDeviceManagement ? "warn" : "ok"}
+              />
+            </dl>
           </div>
 
           {/* Actions */}
-          <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
-            <HoverButton variant="accent" size="md" className="rounded-lg cursor-pointer">
-              Sign out
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <HoverButton
+              variant="dark"
+              size="md"
+              onClick={signOutNow}
+              isLoading={isSigningOut}
+              className="rounded-lg cursor-pointer"
+            >
+              <span className="inline-flex items-center gap-2">
+                <FiLogOut size={15} />
+                Sign Out
+              </span>
             </HoverButton>
-            <HoverButton variant="secondary" size="md" className="rounded-lg cursor-pointer">
-              Sign out of all devices
+            <HoverButton
+              variant="secondary"
+              size="md"
+              href="/orders"
+              className="rounded-lg cursor-pointer"
+            >
+              My Orders
             </HoverButton>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** A single detail card used in the two-up grid. */
+function DetailCard({
+  icon,
+  label,
+  value,
+  mono,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+      <div className="flex items-center gap-2 text-gray-400 mb-2">
+        {icon}
+        <span className="text-[11px] font-bold tracking-[0.2em] uppercase">
+          {label}
+        </span>
+      </div>
+      <p
+        className={`text-sm font-medium text-gray-900 break-words ${
+          mono ? "font-mono text-[13px]" : ""
+        }`}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+/** A label/value row inside the account meta card. */
+function MetaRow({
+  label,
+  value,
+  mono,
+  tone,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  tone?: "ok" | "warn";
+}) {
+  const toneClass =
+    tone === "warn"
+      ? "text-red-600 font-semibold"
+      : tone === "ok"
+        ? "text-green-700 font-semibold"
+        : "text-gray-900";
+
+  return (
+    <div className="flex items-center justify-between gap-4 py-3">
+      <dt className="text-sm text-gray-500">{label}</dt>
+      <dd
+        className={`text-sm text-right break-all min-w-0 ${
+          mono ? "font-mono text-[12px]" : ""
+        } ${toneClass}`}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+/** Loading skeleton mirroring the real layout to avoid empty-screen flashes. */
+function ProfileSkeleton() {
+  return (
+    <div className="bg-[#FCFAF6] min-h-screen">
+      <div className="container mx-auto px-4 lg:px-12 py-10 md:py-16 max-w-3xl">
+        <div className="mb-8 md:mb-12">
+          <Skeleton className="h-3 w-16 mb-2" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-gray-100 bg-white p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6">
+              <Skeleton className="h-16 w-16 rounded-full" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-56" />
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Skeleton className="h-24 rounded-2xl" />
+            <Skeleton className="h-24 rounded-2xl" />
+          </div>
+          <Skeleton className="h-40 rounded-2xl" />
         </div>
       </div>
     </div>

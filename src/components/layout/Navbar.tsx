@@ -3,14 +3,14 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
-import { FiUser, FiSearch, FiChevronDown, FiX } from "react-icons/fi";
+import { FiSearch, FiChevronDown, FiX, FiLogIn } from "react-icons/fi";
 import { storeCategories } from "@/data/categories";
 import { desktopNavigationGroups } from "@/data/navigation";
 import { useCart } from "@/hooks/useCart";
+import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
 import { products } from "@/data/products";
 import { formatPrice } from "@/lib/formatters";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
-import { useSession, signOut } from "@/lib/auth-client";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
 
@@ -21,12 +21,8 @@ export const Navbar = () => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
-  const { data: session, isPending } = useSession();
-
-  const handleLogout = async () => {
-    await signOut();
-    router.push("/login");
-  };
+  const { user, isPending, isAuthenticated } = useAuthCheck();
+  const { signOutNow } = useSignOut("/");
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -254,30 +250,31 @@ export const Navbar = () => {
         <div className="flex items-center gap-6">
           {isPending ? (
             <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
-          ) : session ? (
+          ) : isAuthenticated && user ? (
             <div className="relative group">
               <button
                 onClick={() => setShowAccountMenu(!showAccountMenu)}
                 className="flex items-center gap-2 hover:opacity-80 transition-opacity p-1"
                 aria-label="Open account menu"
               >
-                {session.user.image ? (
+                {user.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={session.user.image}
-                    alt={session.user.name || "User"}
+                    src={user.image}
+                    alt={user.name || "User"}
                     className="w-8 h-8 rounded-full object-cover border border-gray-200"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-[#B37068] text-white flex items-center justify-center font-bold text-sm">
-                    {session.user.name?.[0]?.toUpperCase() || "U"}
+                    {user.name?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
               </button>
 
               <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 py-2">
                 <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 truncate">{session.user.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{session.user.email}</p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
                 </div>
                 <Link
                   href="/profile"
@@ -299,7 +296,7 @@ export const Navbar = () => {
                 </button>
                 <hr className="my-2" />
                 <button
-                  onClick={handleLogout}
+                  onClick={signOutNow}
                   className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                 >
                   Logout
@@ -307,30 +304,14 @@ export const Navbar = () => {
               </div>
             </div>
           ) : (
-            <div className="relative group">
-              <button
-                onClick={() => setShowAccountMenu(!showAccountMenu)}
-                className="hover:opacity-70 transition-opacity p-2"
-                aria-label="Open account menu"
-              >
-                <FiUser size={24} className="text-black cursor-pointer" strokeWidth={1.5} />
-              </button>
-
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 py-2">
-                <Link
-                  href="/login"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Create Account
-                </Link>
-              </div>
-            </div>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-sm font-medium text-black hover:opacity-70 transition-opacity px-2 py-1"
+              aria-label="Sign in"
+            >
+              <FiLogIn size={20} strokeWidth={1.5} />
+              <span className="hidden lg:inline tracking-widest uppercase">Login</span>
+            </Link>
           )}
 
           <button
