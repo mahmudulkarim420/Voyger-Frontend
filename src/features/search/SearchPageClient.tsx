@@ -1,22 +1,44 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { products } from "@/data/products";
+import { products as fallbackProducts } from "@/data/products";
 import { ProductCard } from "@/features/products/ProductCard";
 import { HoverButton } from "@/components/ui/HoverButton";
+import { fetchApi } from "@/lib/api";
 
 export default function SearchPageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get("q") || "";
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      product.category.toLowerCase().includes(query.toLowerCase()) ||
-      product.description.toLowerCase().includes(query.toLowerCase()),
-  );
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!query) {
+      setFilteredProducts([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    fetchApi(`search?q=${encodeURIComponent(query)}`).then((res) => {
+      if (res.success && Array.isArray(res.data)) {
+        setFilteredProducts(res.data);
+      } else {
+        const staticFiltered = fallbackProducts.filter(
+          (product) =>
+            product.name.toLowerCase().includes(query.toLowerCase()) ||
+            product.category.toLowerCase().includes(query.toLowerCase()) ||
+            product.description.toLowerCase().includes(query.toLowerCase()),
+        );
+        setFilteredProducts(staticFiltered);
+      }
+      setLoading(false);
+    });
+  }, [query]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -48,7 +70,7 @@ export default function SearchPageClient() {
                 type="submit"
                 variant="primary"
                 size="md"
-                className="rounded-none border-none p-0 px-6 w-auto"
+                className="rounded-none border-none p-0 px-6 w-auto cursor-pointer"
                 aria-label="Submit search"
               >
                 <svg
@@ -72,7 +94,13 @@ export default function SearchPageClient() {
       </div>
 
       <div className="container-standard section-padding">
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-64 bg-gray-100 animate-pulse rounded" />
+            ))}
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div>
             <p className="text-[#6A5A4A] mb-12 italic font-light">
               Found {filteredProducts.length} result{filteredProducts.length !== 1 ? "s" : ""} for

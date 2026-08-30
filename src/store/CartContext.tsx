@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useEffect } from "react";
 import type { Product } from "@/types";
+import { fetchApi } from "@/lib/api";
 
 export interface CartItem extends Product {
   quantity: number;
@@ -10,7 +11,7 @@ export interface CartItem extends Product {
 
 export interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, size?: string) => void;
+  addToCart: (product: Product, size?: string, quantity?: number, openDrawer?: boolean) => void;
   removeFromCart: (productId: string, size?: string) => void;
   updateQuantity: (productId: string, quantity: number, size?: string) => void;
   clearCart: () => void;
@@ -27,28 +28,42 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem("voyage_cart");
     if (savedCart) {
       try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCartItems(JSON.parse(savedCart));
       } catch (error) {
         console.error("Failed to parse cart from localStorage", error);
       }
     }
     setIsMounted(true);
+
+    fetchApi("cart").then((res) => {
+      if (res.success && res.data?.items && res.data.items.length > 0) {
+        const serverItems: CartItem[] = res.data.items.map((item: any) => ({
+          id: item.productId,
+          name: item.name,
+          price: item.price,
+          description: "",
+          category: "shirt" as any,
+          stock: item.stock ?? 10,
+          images: [item.image],
+          quantity: item.quantity,
+          selectedSize: item.size,
+        }));
+        setCartItems(serverItems);
+      }
+    });
   }, []);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isMounted) {
       localStorage.setItem("voyage_cart", JSON.stringify(cartItems));
     }
   }, [cartItems, isMounted]);
 
-  const addToCart = (product: Product, size?: string) => {
+  const addToCart = (product: Product, size?: string, qtyToAdd = 1, openDrawer = true) => {
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex(
         (item) => item.id === product.id && item.selectedSize === size
@@ -56,19 +71,32 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (existingItemIndex > -1) {
         const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += 1;
+        updatedItems[existingItemIndex].quantity += qtyToAdd;
         return updatedItems;
       }
 
-      return [...prevItems, { ...product, quantity: 1, selectedSize: size }];
+      return [...prevItems, { ...product, quantity: qtyToAdd, selectedSize: size }];
     });
-    setIsCartOpen(true);
+
+    fetchApi("cart/items", {
+      method: "POST",
+      body: JSON.stringify({ productId: product.id, size, quantity: qtyToAdd }),
+    });
+
+    if (openDrawer) {
+      setIsCartOpen(true);
+    }
   };
 
   const removeFromCart = (productId: string, size?: string) => {
-    setCartItems((prevItems) => 
+    setCartItems((prevItems) =>
       prevItems.filter((item) => !(item.id === productId && item.selectedSize === size))
     );
+
+    const query = size ? `?size=${encodeURIComponent(size)}` : "";
+    fetchApi(`cart/items/${productId}${query}`, {
+      method: "DELETE",
+    });
   };
 
   const updateQuantity = (productId: string, quantity: number, size?: string) => {
@@ -80,10 +108,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           : item
       )
     );
+
+    const query = size ? `?size=${encodeURIComponent(size)}` : "";
+    fetchApi(`cart/items/${productId}${query}`, {
+      method: "PATCH",
+      body: JSON.stringify({ quantity }),
+    });
   };
 
   const clearCart = () => {
     setCartItems([]);
+    fetchApi("cart", { method: "DELETE" });
   };
 
   const cartTotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);

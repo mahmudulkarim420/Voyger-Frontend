@@ -54,7 +54,7 @@ Voyger-Frontend/
 │   └── types/              # TypeScript interfaces & type definitions
 ├── .env                    # Environment variables configuration
 ├── next.config.ts          # Next.js configuration
-├── package.json            # Dependencies & npm scripts
+├── package.json            # Dependencies & pnpm scripts
 └── tsconfig.json           # TypeScript configuration
 ```
 
@@ -66,7 +66,7 @@ Voyger-Frontend/
 
 Ensure you have the following installed on your machine:
 - **Node.js**: `v18.x` or higher
-- **npm**, **pnpm**, or **yarn**
+- **pnpm** (recommended) or **npm** / **yarn**
 
 ### Installation
 
@@ -78,7 +78,7 @@ Ensure you have the following installed on your machine:
 
 2. **Install dependencies**:
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Configure Environment Variables**:
@@ -90,7 +90,7 @@ Ensure you have the following installed on your machine:
 
 4. **Run the Development Server**:
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
    Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
@@ -103,10 +103,10 @@ In the project directory, you can run:
 
 | Command | Description |
 | :--- | :--- |
-| `npm run dev` | Runs the app in development mode on `http://localhost:3000` |
-| `npm run build` | Builds the application for production deployment |
-| `npm run start` | Starts the production server after building |
-| `npm run lint` | Runs ESLint to check for code formatting and quality issues |
+| `pnpm dev` | Runs the app in development mode on `http://localhost:3000` |
+| `pnpm build` | Builds the application for production deployment |
+| `pnpm start` | Starts the production server after building |
+| `pnpm lint` | Runs ESLint to check for code formatting and quality issues |
 
 ---
 

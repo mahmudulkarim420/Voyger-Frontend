@@ -1,8 +1,9 @@
-import { products, featuredProducts } from "@/data/products";
+import { products as fallbackProducts } from "@/data/products";
 import { storeCategories } from "@/data/categories";
 import { ProductCard } from "@/features/products/ProductCard";
 import type { ProductCategorySlug } from "@/types";
 import Link from "next/link";
+import { fetchApi } from "@/lib/api";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
@@ -11,34 +12,36 @@ interface CategoryPageProps {
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { category } = await params;
 
-  let filteredProducts = [];
+  let filteredProducts: any[] = [];
 
-  // Special handling for new-arrivals category
-  if (category === "new-arrivals") {
-    // Show featured products for new-arrivals
-    filteredProducts = featuredProducts;
+  const res = await fetchApi(`categories/${category}`);
+
+  if (res.success && res.data && res.data.products) {
+    filteredProducts = res.data.products;
   } else {
-    // Get products for this category and all its subcategories
-    const categoriesToInclude: ProductCategorySlug[] = [category as ProductCategorySlug];
-
-    // Find all subcategories if this is a parent category
-    const subCategories = storeCategories
-      .filter((cat) => cat.parentId === category)
-      .map((cat) => cat.id);
-
-    categoriesToInclude.push(...subCategories);
-
-    // Filter products by category and subcategories
-    filteredProducts = products.filter((p) => categoriesToInclude.includes(p.category));
+    // Fallback to products endpoint or static mock
+    const prodRes = await fetchApi(`products?category=${category}&limit=50`);
+    if (prodRes.success && prodRes.data) {
+      filteredProducts = prodRes.data;
+    } else {
+      if (category === "new-arrivals") {
+        filteredProducts = fallbackProducts.filter((p) => p.isFeatured);
+      } else {
+        const categoriesToInclude: ProductCategorySlug[] = [category as ProductCategorySlug];
+        const subCategories = storeCategories
+          .filter((cat) => cat.parentId === category)
+          .map((cat) => cat.id);
+        categoriesToInclude.push(...subCategories);
+        filteredProducts = fallbackProducts.filter((p) => categoriesToInclude.includes(p.category));
+      }
+    }
   }
 
-  // Format category title
   const getCategoryName = (): string => {
     const categoryData = storeCategories.find((cat) => cat.id === category);
     if (categoryData) {
       return categoryData.name;
     }
-    // Fallback: convert slug to title case
     return category
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
-import { products } from "@/data/products";
 import { ProductCard } from "@/features/products/ProductCard";
 import { ProductFilters } from "@/features/products/ProductFilters";
 import { Pagination } from "@/features/products/Pagination";
-import { storeCategories } from "@/data/categories";
+import { fetchApi } from "@/lib/api";
+import { products as fallbackProducts } from "@/data/products";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -19,68 +19,41 @@ export interface ProductsPageProps {
 export default async function ProductsPage(props: ProductsPageProps) {
   const searchParams = await props.searchParams;
   const search = typeof searchParams.search === "string" ? searchParams.search : "";
-  const category = typeof searchParams.category === "string" ? searchParams.category : "all";
+  const category = typeof searchParams.category === "string" ? searchParams.category : "";
   const sort = typeof searchParams.sort === "string" ? searchParams.sort : "newest";
   const page = typeof searchParams.page === "string" ? searchParams.page : "1";
-  
   const currentPage = parseInt(page);
 
-  // Filtering and Sorting Logic
-  let filteredProducts = [...products];
+  const queryParams = new URLSearchParams();
+  if (search) queryParams.set("search", search);
+  if (category && category !== "all") queryParams.set("category", category);
+  if (sort) queryParams.set("sort", sort);
+  queryParams.set("page", page);
+  queryParams.set("limit", ITEMS_PER_PAGE.toString());
 
-  // 1. Search Filter
-  if (search) {
-    const query = search.toLowerCase();
-    filteredProducts = filteredProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query)
-    );
+  const response = await fetchApi(`products?${queryParams.toString()}`);
+
+  let paginatedProducts = [];
+  let totalProducts = 0;
+  let totalPages = 1;
+
+  if (response.success && response.data) {
+    paginatedProducts = response.data;
+    totalProducts = response.meta?.total ?? response.data.length;
+    totalPages = response.meta?.totalPages ?? Math.ceil(totalProducts / ITEMS_PER_PAGE);
+  } else {
+    // Fallback to static products if backend is not reachable
+    let filtered = [...fallbackProducts];
+    if (search) {
+      filtered = filtered.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+    }
+    if (category && category !== "all") {
+      filtered = filtered.filter((p) => p.category === category);
+    }
+    totalProducts = filtered.length;
+    totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
+    paginatedProducts = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   }
-
-  // 2. Category Filter (including subcategories)
-  if (category && category !== "all") {
-    const categoriesToInclude = [category];
-    
-    // Find all subcategories if this is a parent category
-    const subCategories = storeCategories
-      .filter((cat) => cat.parentId === category)
-      .map((cat) => cat.id);
-    
-    categoriesToInclude.push(...subCategories);
-    
-    filteredProducts = filteredProducts.filter((p) => 
-      categoriesToInclude.includes(p.category)
-    );
-  }
-
-  // 3. Sorting
-  switch (sort) {
-    case "price-low":
-      filteredProducts.sort((a, b) => a.price - b.price);
-      break;
-    case "price-high":
-      filteredProducts.sort((a, b) => b.price - a.price);
-      break;
-    case "name-asc":
-      filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-      break;
-    case "newest":
-    default:
-      filteredProducts.sort(
-        (a, b) =>
-          new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()
-      );
-  }
-
-  // 4. Pagination Logic
-  const totalProducts = filteredProducts.length;
-  const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
-  const safePage = Math.min(Math.max(1, currentPage), totalPages || 1);
-  const paginatedProducts = filteredProducts.slice(
-    (safePage - 1) * ITEMS_PER_PAGE,
-    safePage * ITEMS_PER_PAGE
-  );
 
   return (
     <div className="w-full min-h-screen bg-[#FCFAF6] section-padding pt-10">
@@ -101,17 +74,17 @@ export default async function ProductsPage(props: ProductsPageProps) {
         {paginatedProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
-              {paginatedProducts.map((product, index) => (
+              {paginatedProducts.map((product: any, index: number) => (
                 <ProductCard
                   key={product.id}
                   product={product}
-                  priority={index < 4 && safePage === 1}
+                  priority={index < 4 && currentPage === 1}
                 />
               ))}
             </div>
 
             <Suspense fallback={<div className="h-10 w-48 mx-auto bg-gray-50 animate-pulse rounded-full mt-16" />}>
-              <Pagination currentPage={safePage} totalPages={totalPages} />
+              <Pagination currentPage={currentPage} totalPages={totalPages} />
             </Suspense>
           </>
         ) : (

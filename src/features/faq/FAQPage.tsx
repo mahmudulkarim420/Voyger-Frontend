@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { BrandPillars } from "@/components/shared/BrandPillars";
 import { PageHero } from "@/components/shared/PageHero";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import { HoverButton } from "@/components/ui/HoverButton";
+import { fetchApi } from "@/lib/api";
 
-const faqs = [
+const fallbackFaqs = [
   {
     question: "How can I contact VOYAGE support?",
     answer:
@@ -32,6 +33,15 @@ const faqs = [
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [faqs, setFaqs] = useState<any[]>(fallbackFaqs);
+
+  useEffect(() => {
+    fetchApi("content/faq").then((res) => {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setFaqs(res.data);
+      }
+    });
+  }, []);
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -46,11 +56,9 @@ export default function FAQPage() {
         heightClassName="h-[300px] md:h-[400px]"
       />
 
-      {/* FAQ Content Section */}
       <section className="py-24">
         <div className="container-standard">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
-            {/* Left Column */}
             <div className="flex flex-col items-start gap-8 sticky top-32">
               <div className="space-y-4">
                 <span className="text-[#B37068] text-sm font-bold tracking-[0.2em] uppercase">
@@ -68,20 +76,19 @@ export default function FAQPage() {
                 <HoverButton
                   variant="dark"
                   size="lg"
-                  className="rounded-none uppercase tracking-widest"
+                  className="rounded-none uppercase tracking-widest cursor-pointer"
                 >
                   About Our Story
                 </HoverButton>
               </Link>
             </div>
 
-            {/* Right Column (Accordion) */}
             <div className="flex flex-col border-t border-gray-200">
               {faqs.map((faq, index) => (
                 <div key={index} className="border-b border-gray-100 group">
                   <button
                     onClick={() => toggleAccordion(index)}
-                    className="w-full py-8 flex items-center justify-between text-left transition-colors"
+                    className="w-full py-8 flex items-center justify-between text-left transition-colors cursor-pointer"
                   >
                     <span
                       className={`text-base md:text-lg font-medium tracking-wide transition-colors duration-300 ${openIndex === index ? "text-[#B37068]" : "text-[#2F2923] group-hover:text-[#B37068]"}`}

@@ -7,6 +7,8 @@ import { formatPrice } from "@/lib/formatters";
 import { IoHelpCircleOutline } from "react-icons/io5";
 import { FaChevronDown } from "react-icons/fa";
 import { HoverButton } from "@/components/ui/HoverButton";
+import { fetchApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const shippingMethods = [
   { id: "in-dhaka", label: "In Dhaka", price: 70 },
@@ -15,58 +17,99 @@ const shippingMethods = [
 ];
 
 export default function CheckoutPage() {
-  const { cartItems, cartTotal } = useCart();
+  const router = useRouter();
+  const { cartItems, cartTotal, clearCart } = useCart();
   const [selectedShipping, setSelectedShipping] = useState(shippingMethods[0]);
   const [paymentMethod, setPaymentMethod] = useState("sslcommerz");
   const [billingAddress, setBillingAddress] = useState("same");
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [phone, setPhone] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const total = cartTotal + selectedShipping.price;
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      setErrorMessage("Your cart is empty.");
+      return;
+    }
+
+    if (!lastName || !address || !city || !phone) {
+      setErrorMessage("Please fill in all required shipping address fields.");
+      return;
+    }
+
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      // alert("Order placed successfully");
-    }, 2000);
+    setErrorMessage("");
+
+    const orderPayload = {
+      items: cartItems.map((item) => ({
+        productId: item.id,
+        size: item.selectedSize,
+        quantity: item.quantity,
+      })),
+      shipping: {
+        method: selectedShipping.id,
+        address: {
+          firstName,
+          lastName,
+          country: "Bangladesh",
+          address,
+          city,
+          postalCode,
+          phone,
+        },
+      },
+      billing: {
+        sameAsShipping: billingAddress === "same",
+      },
+      paymentMethod,
+    };
+
+    const res = await fetchApi("orders", {
+      method: "POST",
+      body: JSON.stringify(orderPayload),
+    });
+
+    setIsLoading(false);
+
+    if (res.success && res.data) {
+      clearCart();
+      if (paymentMethod === "sslcommerz" && res.data.gatewayUrl) {
+        // If external gateway URL, redirect
+        if (res.data.gatewayUrl.startsWith("http")) {
+          window.location.href = res.data.gatewayUrl;
+        } else {
+          router.push("/orders");
+        }
+      } else {
+        router.push("/orders");
+      }
+    } else {
+      setErrorMessage(res.message || "Failed to place order. Please try again.");
+    }
   };
 
   return (
     <div className="min-h-screen w-full bg-[#FCFAF6]">
       <div className="container mx-auto px-4 lg:px-12 max-w-7xl py-6 md:py-8 lg:py-0">
-        {/* মোবাইলের জন্য flex-col-reverse ব্যবহার করা হয়েছে, যাতে Order Summary আগে দেখায় */}
         <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 lg:gap-0">
           
-          {/* Left Column: Form (মোবাইলে এটি নিচে থাকবে) */}
           <div className="lg:col-span-7 py-8 lg:py-12 lg:pr-16 lg:border-r border-gray-200 mt-6 lg:mt-0 border-t lg:border-t-0">
-            {/* Contact */}
-            <div className="mb-8 lg:mb-10">
-              <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold text-gray-500">
-                    M
-                  </div>
-                  <span className="text-sm text-gray-700 truncate max-w-[200px] sm:max-w-none">
-                    mknaiem998@gmail.com
-                  </span>
-                </div>
-                <button className="text-gray-400 p-1">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <circle cx="12" cy="12" r="1" />
-                    <circle cx="12" cy="5" r="1" />
-                    <circle cx="12" cy="19" r="1" />
-                  </svg>
-                </button>
+            {errorMessage && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-md">
+                {errorMessage}
               </div>
+            )}
 
+            <div className="mb-8 lg:mb-10">
               <div className="space-y-4">
                 <div className="relative">
                   <label className="absolute left-4 top-2 text-[10px] text-gray-400 uppercase tracking-wider">
@@ -81,36 +124,44 @@ export default function CheckoutPage() {
                   />
                 </div>
 
-                {/* মোবাইলের জন্য grid-cols-1 এবং বড় স্ক্রিনের জন্য sm:grid-cols-2 */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
                     type="text"
                     placeholder="First name (optional)"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
                     className="w-full text-gray-900 placeholder:text-gray-500 bg-white border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] font-medium"
                   />
                   <input
                     type="text"
-                    placeholder="Last name"
+                    placeholder="Last name *"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                     className="w-full text-gray-900 placeholder:text-gray-500 bg-white border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] font-medium"
                   />
                 </div>
 
                 <input
                   type="text"
-                  placeholder="Address"
+                  placeholder="Address *"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   className="w-full text-gray-900 placeholder:text-gray-500 bg-white border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] font-medium"
                 />
 
-                {/* মোবাইলের জন্য grid-cols-1 এবং বড় স্ক্রিনের জন্য sm:grid-cols-2 */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
                     type="text"
-                    placeholder="City"
+                    placeholder="City *"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
                     className="w-full text-gray-900 placeholder:text-gray-500 bg-white border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] font-medium"
                   />
                   <input
                     type="text"
                     placeholder="Postal code (optional)"
+                    value={postalCode}
+                    onChange={(e) => setPostalCode(e.target.value)}
                     className="w-full text-gray-900 placeholder:text-gray-500 bg-white border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] font-medium"
                   />
                 </div>
@@ -118,7 +169,9 @@ export default function CheckoutPage() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Phone"
+                    placeholder="Phone *"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     className="w-full text-gray-900 placeholder:text-gray-500 bg-white border border-gray-300 rounded-md px-4 py-3 text-sm focus:outline-none focus:ring focus:ring-[#A05C55] focus:border-[#A05C55] font-medium pr-10"
                   />
                   <IoHelpCircleOutline
@@ -129,7 +182,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Shipping Method */}
             <div className="mb-8 lg:mb-10">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Shipping method</h3>
               <div className="border border-gray-300 rounded-md overflow-hidden">
@@ -160,7 +212,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Payment */}
             <div className="mb-8 lg:mb-10">
               <h3 className="text-lg font-medium text-gray-900 mb-2">Payment</h3>
               <p className="text-sm text-gray-500 mb-4">
@@ -182,7 +233,6 @@ export default function CheckoutPage() {
                       />
                       <span className="text-sm text-gray-700 font-medium">SSLCOMMERZ</span>
                     </div>
-                    {/* পেমেন্ট আইকনগুলো মোবাইলে যেন ভেঙে না যায় তাই flex-wrap দেওয়া হয়েছে */}
                     <div className="flex flex-wrap gap-1.5 ml-8 sm:ml-0">
                       <div className="w-8 h-5 bg-white border border-gray-200 rounded flex items-center justify-center text-[8px] font-bold text-blue-800 italic">
                         VISA
@@ -223,7 +273,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Billing Address */}
             <div className="mb-10">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Billing address</h3>
               <div className="border border-gray-300 rounded-md overflow-hidden">
@@ -265,18 +314,13 @@ export default function CheckoutPage() {
             </HoverButton>
           </div>
 
-          {/* Right Column: Order Summary (মোবাইলে এটি উপরে থাকবে) */}
           <div className="lg:col-span-5 pt-4 pb-8 lg:py-12 lg:pl-16 bg-[#FCFAF6]">
-            
-            {/* Mobile Header for Order Summary */}
             <h2 className="text-xl font-bold text-gray-900 mb-6 lg:hidden">Order Summary</h2>
 
             <div className="flex flex-col gap-6 mb-8">
               {cartItems.map((item, idx) => (
                 <div key={`${item.id}-${idx}`} className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    
-                    {/* কোয়ান্টিটি ব্যাজ ফিক্স: overflow-hidden এর বাইরে রাখা হয়েছে যাতে কেটে না যায় */}
                     <div className="relative flex-shrink-0">
                       <div className="relative w-16 h-16 bg-white border border-gray-200 rounded-lg overflow-hidden">
                         <Image src={item.images[0]} alt={item.name} fill className="object-cover" />

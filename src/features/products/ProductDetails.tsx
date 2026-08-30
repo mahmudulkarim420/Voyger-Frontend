@@ -44,7 +44,6 @@ export default function ProductDetails({
   const [isBuying, setIsBuying] = useState(false);
   const activeProductImage = product.images[activeImage] ?? product.images[0];
 
-  // Use a placeholder base URL for social sharing
   const baseUrl = "https://voyage-fashion.com";
   const shareUrl = `${baseUrl}/product/${product.id}`;
   const encodedShareUrl = encodeURIComponent(shareUrl);
@@ -216,10 +215,10 @@ export default function ProductDetails({
               <HoverButton
                 onClick={() => {
                   setIsAdding(true);
+                  addToCart(product, selectedSize, quantity, true);
                   setTimeout(() => {
-                    addToCart(product, selectedSize);
                     setIsAdding(false);
-                  }, 600);
+                  }, 400);
                 }}
                 variant="primary"
                 size="lg"
@@ -232,12 +231,10 @@ export default function ProductDetails({
               <HoverButton
                 onClick={() => {
                   setIsBuying(true);
-                  setTimeout(() => {
-                    addToCart(product, selectedSize);
-                    setIsCartOpen(false);
-                    setIsBuying(false);
-                    router.push("/checkout");
-                  }, 800);
+                  addToCart(product, selectedSize, quantity, false);
+                  setIsCartOpen(false);
+                  setIsBuying(false);
+                  router.push("/checkout");
                 }}
                 variant="success"
                 size="lg"
@@ -377,7 +374,7 @@ export default function ProductDetails({
                       <h3 className="text-[10px] md:text-xs font-bold text-[#3A322B] group-hover:text-[#A05C55] transition-colors tracking-wide uppercase">
                         {item.name}
                       </h3>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                         <span className="text-xs font-bold text-[#3A322B]">
                           {formatPrice(item.price)}
                         </span>
