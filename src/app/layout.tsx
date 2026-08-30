@@ -22,8 +22,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${baskervville.variable} antialiased`}>
-      <body className="min-h-screen flex flex-col">
+    <html lang="en" className={`${baskervville.variable} antialiased`} suppressHydrationWarning>
+      <body className="min-h-screen flex flex-col" suppressHydrationWarning>
         <GlobalLoader />
         <CartProvider>{children}</CartProvider>
       </body>

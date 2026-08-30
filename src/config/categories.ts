@@ -169,4 +169,3 @@ export const storeCategories: StoreCategory[] = [
 ];
 
 export const featuredCategories = storeCategories.filter((category) => category.featured);
-

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BsCart2 } from "react-icons/bs";
 import { FiSearch, FiChevronDown, FiX, FiLogIn } from "react-icons/fi";
-import { storeCategories } from "@/data/categories";
-import { desktopNavigationGroups } from "@/data/navigation";
+import { storeCategories } from "@/config/categories";
+import { desktopNavigationGroups } from "@/config/navigation";
 import { useCart } from "@/hooks/useCart";
 import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
-import { products } from "@/data/products";
+import { fetchApi } from "@/lib/api";
 import { formatPrice } from "@/lib/formatters";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
@@ -18,6 +18,7 @@ export const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
@@ -35,16 +36,24 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const suggestions = useMemo(() => {
-    if (searchQuery.trim().length <= 1) return [];
+  // Fetch search suggestions dynamically from backend API
+  useEffect(() => {
+    if (searchQuery.trim().length <= 1) {
+      setSuggestions([]);
+      return;
+    }
 
-    const query = searchQuery.toLowerCase();
+    const timer = setTimeout(() => {
+      fetchApi(`search?q=${encodeURIComponent(searchQuery)}`).then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          setSuggestions(res.data.slice(0, 5));
+        } else {
+          setSuggestions([]);
+        }
+      });
+    }, 300);
 
-    return products
-      .filter(
-        (p) => p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
-      )
-      .slice(0, 5);
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const shouldShowSuggestions = showSuggestions && searchQuery.trim().length > 1;

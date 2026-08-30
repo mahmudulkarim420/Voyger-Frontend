@@ -1,16 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icons/bs";
 import { FiHome, FiLogIn, FiUser, FiPackage, FiGrid, FiChevronRight, FiLogOut } from "react-icons/fi";
-import { storeCategories } from "@/data/categories";
-import { bottomNavigation, mobileNavigationGroups, trendingSearches } from "@/data/navigation";
+import { storeCategories } from "@/config/categories";
+import { bottomNavigation, mobileNavigationGroups, trendingSearches } from "@/config/navigation";
 import { isAccountRoute } from "@/lib/navigation";
 import { useCart } from "@/hooks/useCart";
 import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
-import { products } from "@/data/products";
+import { fetchApi } from "@/lib/api";
 import { formatPrice } from "@/lib/formatters";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
@@ -20,6 +20,7 @@ export const MobileNavigation = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const router = useRouter();
   const pathname = usePathname();
   const { cartCount, setIsCartOpen } = useCart();
@@ -27,16 +28,24 @@ export const MobileNavigation = () => {
   const { signOutNow } = useSignOut("/");
   const isOnAccountPage = isAccountRoute(pathname);
 
-  const suggestions = useMemo(() => {
-    if (searchQuery.trim().length <= 1) return [];
+  // Fetch search suggestions dynamically from backend API
+  useEffect(() => {
+    if (searchQuery.trim().length <= 1) {
+      setSuggestions([]);
+      return;
+    }
 
-    const query = searchQuery.toLowerCase();
+    const timer = setTimeout(() => {
+      fetchApi(`search?q=${encodeURIComponent(searchQuery)}`).then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          setSuggestions(res.data.slice(0, 6));
+        } else {
+          setSuggestions([]);
+        }
+      });
+    }, 300);
 
-    return products
-      .filter(
-        (p) => p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query),
-      )
-      .slice(0, 6);
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {

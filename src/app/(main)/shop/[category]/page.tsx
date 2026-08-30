@@ -1,7 +1,5 @@
-import { products as fallbackProducts } from "@/data/products";
-import { storeCategories } from "@/data/categories";
+import { storeCategories } from "@/config/categories";
 import { ProductCard } from "@/features/products/ProductCard";
-import type { ProductCategorySlug } from "@/types";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api";
 
@@ -19,21 +17,9 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   if (res.success && res.data && res.data.products) {
     filteredProducts = res.data.products;
   } else {
-    // Fallback to products endpoint or static mock
     const prodRes = await fetchApi(`products?category=${category}&limit=50`);
     if (prodRes.success && prodRes.data) {
-      filteredProducts = prodRes.data;
-    } else {
-      if (category === "new-arrivals") {
-        filteredProducts = fallbackProducts.filter((p) => p.isFeatured);
-      } else {
-        const categoriesToInclude: ProductCategorySlug[] = [category as ProductCategorySlug];
-        const subCategories = storeCategories
-          .filter((cat) => cat.parentId === category)
-          .map((cat) => cat.id);
-        categoriesToInclude.push(...subCategories);
-        filteredProducts = fallbackProducts.filter((p) => categoriesToInclude.includes(p.category));
-      }
+      filteredProducts = Array.isArray(prodRes.data) ? prodRes.data : (prodRes.data.products ?? []);
     }
   }
 

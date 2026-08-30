@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { products as fallbackProducts } from "@/data/products";
 import { ProductCard } from "@/features/products/ProductCard";
 import { HoverButton } from "@/components/ui/HoverButton";
 import { fetchApi } from "@/lib/api";
@@ -28,13 +27,7 @@ export default function SearchPageClient() {
       if (res.success && Array.isArray(res.data)) {
         setFilteredProducts(res.data);
       } else {
-        const staticFiltered = fallbackProducts.filter(
-          (product) =>
-            product.name.toLowerCase().includes(query.toLowerCase()) ||
-            product.category.toLowerCase().includes(query.toLowerCase()) ||
-            product.description.toLowerCase().includes(query.toLowerCase()),
-        );
-        setFilteredProducts(staticFiltered);
+        setFilteredProducts([]);
       }
       setLoading(false);
     });

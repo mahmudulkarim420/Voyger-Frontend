@@ -3,8 +3,8 @@
 import React, { useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FiSearch, FiX } from "react-icons/fi";
-import { SlidersHorizontal } from "lucide-react"; // ফিল্টার আইকনের জন্য
-import { storeCategories } from "@/data/categories";
+import { SlidersHorizontal } from "lucide-react";
+import { storeCategories } from "@/config/categories";
 
 export const ProductFilters = () => {
   const router = useRouter();

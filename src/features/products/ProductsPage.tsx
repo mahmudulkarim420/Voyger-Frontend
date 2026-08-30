@@ -3,7 +3,6 @@ import { ProductCard } from "@/features/products/ProductCard";
 import { ProductFilters } from "@/features/products/ProductFilters";
 import { Pagination } from "@/features/products/Pagination";
 import { fetchApi } from "@/lib/api";
-import { products as fallbackProducts } from "@/data/products";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -38,21 +37,9 @@ export default async function ProductsPage(props: ProductsPageProps) {
   let totalPages = 1;
 
   if (response.success && response.data) {
-    paginatedProducts = response.data;
-    totalProducts = response.meta?.total ?? response.data.length;
+    paginatedProducts = Array.isArray(response.data) ? response.data : (response.data.products ?? []);
+    totalProducts = response.meta?.total ?? paginatedProducts.length;
     totalPages = response.meta?.totalPages ?? Math.ceil(totalProducts / ITEMS_PER_PAGE);
-  } else {
-    // Fallback to static products if backend is not reachable
-    let filtered = [...fallbackProducts];
-    if (search) {
-      filtered = filtered.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
-    }
-    if (category && category !== "all") {
-      filtered = filtered.filter((p) => p.category === category);
-    }
-    totalProducts = filtered.length;
-    totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
-    paginatedProducts = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   }
 
   return (
