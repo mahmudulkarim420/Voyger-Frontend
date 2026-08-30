@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
   let requiresDeviceMgmt: boolean | undefined = undefined;
 
   if (sessionToken) {
-    const authUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/api/v1/auth";
+    const authUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5001/api/v1/auth";
 
     try {
       const res = await fetch(`${authUrl}/get-session`, {

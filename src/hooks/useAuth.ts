@@ -64,6 +64,7 @@ export function useAuthCheck(): UseAuthCheckResult {
 
   const user = session?.user;
   const custom = getCustomFields(user);
+  const detectedRole = custom.role || (user as { role?: string })?.role || (session as { user?: { role?: string } })?.user?.role;
 
   const hasResolved = !isPending;
   const isAuthenticated = hasResolved && Boolean(session && user);
@@ -75,7 +76,7 @@ export function useAuthCheck(): UseAuthCheckResult {
     isPending,
     isAuthenticated,
     isUnauthenticated,
-    role: custom.role,
+    role: detectedRole,
     requiresDeviceManagement: Boolean(custom.requiresDeviceManagement),
     refetch,
   };
