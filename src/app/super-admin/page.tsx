@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
-// Mock Payment History items matching Quixotic layout
+// Payment history items for Quixotic table layout
 const paymentHistoryItems = [
   {
     id: "1",
@@ -51,7 +51,7 @@ const paymentHistoryItems = [
   },
 ];
 
-// Customer avatar stack list
+// Team / Customer avatar stack
 const teamAvatars = [
   "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100&h=100",
   "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100&h=100",
@@ -59,7 +59,7 @@ const teamAvatars = [
   "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=100&h=100",
 ];
 
-export default function DashboardPage() {
+export default function SuperAdminDashboardPage() {
   const { user } = useAuthCheck();
   const userName = user?.name ? user.name.split(" ")[0] : "Sujon";
   const [chartPeriod, setChartPeriod] = useState<"Monthly" | "Annually">("Annually");
@@ -91,7 +91,7 @@ export default function DashboardPage() {
 
       {/* ---------------- 2. TOP GRID (3 CARDS) ---------------- */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* CARD 1 (3 COLS): PAYMENT GOAL & STORE CREDIT CARD */}
+        {/* CARD 1 (4 COLS): PAYMENT GOAL & STORE CREDIT CARD */}
         <div className="md:col-span-4 bg-white rounded-3xl p-6 border border-gray-200/70 shadow-sm flex flex-col justify-between space-y-6">
           <div>
             <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export default function DashboardPage() {
               </button>
             </div>
 
-            {/* Quixotic VISA / Store Credit Card Widget */}
+            {/* Quixotic VISA / Voyage Credit Card Widget */}
             <div className="mt-5 bg-gradient-to-br from-[#B37068] to-[#8E4F49] text-white p-5 rounded-2xl shadow-lg relative overflow-hidden flex flex-col justify-between h-44">
               {/* Card Header */}
               <div className="flex items-center justify-between">
@@ -181,7 +181,7 @@ export default function DashboardPage() {
 
               <button
                 className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 hover:text-black transition-colors cursor-pointer"
-                aria-label="Expand engagement chart"
+                aria-label="Expand chart"
               >
                 <ArrowUpRight size={16} />
               </button>
@@ -251,7 +251,7 @@ export default function DashboardPage() {
               </div>
               <button
                 className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 hover:text-black transition-colors cursor-pointer"
-                aria-label="Expand goal details"
+                aria-label="Expand details"
               >
                 <ArrowUpRight size={16} />
               </button>
@@ -267,14 +267,14 @@ export default function DashboardPage() {
             <div className="mt-4 h-20 w-full overflow-hidden">
               <svg viewBox="0 0 200 60" className="w-full h-full">
                 <defs>
-                  <linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="waveGradSuper" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#B37068" stopOpacity="0.3" />
                     <stop offset="100%" stopColor="#B37068" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
                 <path
                   d="M0,40 Q25,10 50,30 T100,20 T150,45 T200,15 L200,60 L0,60 Z"
-                  fill="url(#waveGradient)"
+                  fill="url(#waveGradSuper)"
                 />
                 <path
                   d="M0,40 Q25,10 50,30 T100,20 T150,45 T200,15"
@@ -314,7 +314,7 @@ export default function DashboardPage() {
 
               <button
                 className="w-8 h-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-500 hover:text-black transition-colors cursor-pointer"
-                aria-label="Expand history"
+                aria-label="Expand payment history"
               >
                 <ArrowUpRight size={16} />
               </button>

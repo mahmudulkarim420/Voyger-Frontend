@@ -4,11 +4,11 @@ import { DashboardNavbar } from "@/components/layout/DashboardNavbar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <DashboardSidebar />
-      <div className="flex-1 flex flex-col">
-        <DashboardNavbar />
-        <main className="p-8">{children}</main>
+    <div className="min-h-screen bg-[#F3F4F6] font-sans antialiased text-[#3A322B]">
+      <DashboardNavbar />
+      <div className="flex w-full">
+        <DashboardSidebar />
+        <main className="flex-1 p-6 md:p-8 min-w-0 overflow-x-hidden">{children}</main>
       </div>
     </div>
   );
