@@ -7,7 +7,7 @@ import { BsCart2, BsHouse, BsSearch, BsPerson, BsHeadset, BsX } from "react-icon
 import { FiHome, FiLogIn, FiUser, FiPackage, FiGrid, FiChevronRight, FiLogOut } from "react-icons/fi";
 import { storeCategories } from "@/config/categories";
 import { bottomNavigation, mobileNavigationGroups, trendingSearches } from "@/config/navigation";
-import { isAccountRoute } from "@/lib/navigation";
+import { isAccountRoute, getDashboardRoute } from "@/lib/navigation";
 import { useCart } from "@/hooks/useCart";
 import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
 import { fetchApi } from "@/lib/api";
@@ -24,7 +24,7 @@ export const MobileNavigation = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { cartCount, setIsCartOpen } = useCart();
-  const { isAuthenticated, isPending } = useAuthCheck();
+  const { isAuthenticated, isPending, role } = useAuthCheck();
   const { signOutNow } = useSignOut("/");
   const isOnAccountPage = isAccountRoute(pathname);
 
@@ -272,7 +272,7 @@ export const MobileNavigation = () => {
                       />
                       <MobileAccountLink
                         name="Dashboard"
-                        href="/dashboard"
+                        href={getDashboardRoute(role)}
                         icon={FiGrid}
                         pathname={pathname}
                         onClick={() => setMenuOpen(false)}

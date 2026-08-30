@@ -1,13 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { signIn, useSession } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn } from "@/lib/auth-client";
+import { useAuthCheck } from "@/hooks/useAuth";
+import { getDashboardRoute } from "@/lib/auth/route-policy";
+import { getSafeCallbackUrl } from "@/lib/security/safe-redirect";
 
-export default function LoginPage() {
+function LoginFormContent() {
   const router = useRouter();
-  const { data: session, isPending } = useSession();
+  const searchParams = useSearchParams();
+  const rawCallbackUrl = searchParams.get("callbackUrl");
+
+  const { isAuthenticated, isPending, role } = useAuthCheck();
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,13 +22,14 @@ export default function LoginPage() {
     setIsMounted(true);
   }, []);
 
-  // If the user is already authenticated, send them to home instead of
-  // letting them sit on the login screen.
+  // If the user is already authenticated, send them to safe callback or default dashboard
   useEffect(() => {
-    if (isMounted && !isPending && session) {
-      router.replace("/");
+    if (isMounted && !isPending && isAuthenticated) {
+      const defaultDashboard = getDashboardRoute(role);
+      const safeTarget = getSafeCallbackUrl(rawCallbackUrl, defaultDashboard);
+      router.replace(safeTarget);
     }
-  }, [isMounted, isPending, session, router]);
+  }, [isMounted, isPending, isAuthenticated, role, rawCallbackUrl, router]);
 
   if (!isMounted) {
     return (
@@ -38,18 +45,21 @@ export default function LoginPage() {
     );
   }
 
-  // Build an absolute callback URL without the trailing slash
+  // Build absolute OAuth callback URL
   const getCallbackURL = () => {
+    const defaultDashboard = getDashboardRoute(role);
+    const targetPath = getSafeCallbackUrl(rawCallbackUrl, defaultDashboard);
+
     if (typeof window !== "undefined") {
-      return window.location.origin;
+      return `${window.location.origin}${targetPath}`;
     }
-    return "https://voyger-frontend.vercel.app";
+    return `https://voyger-frontend.vercel.app${targetPath}`;
   };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setError(null);
-    const { data, error: signInError } = await signIn.social({
+    const { error: signInError } = await signIn.social({
       provider: "google",
       callbackURL: getCallbackURL(),
     });
@@ -62,7 +72,7 @@ export default function LoginPage() {
   const handleFacebookSignIn = async () => {
     setIsLoading(true);
     setError(null);
-    const { data, error: signInError } = await signIn.social({
+    const { error: signInError } = await signIn.social({
       provider: "facebook",
       callbackURL: getCallbackURL(),
     });
@@ -165,5 +175,25 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full max-w-md mx-auto space-y-6 pt-8 md:pt-0 relative px-4">
+          <div className="flex justify-center items-center w-full mb-6 md:mb-10">
+            <div className="w-32 h-9 bg-gray-100 animate-pulse rounded" />
+          </div>
+          <div className="space-y-4 pt-4">
+            <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+          </div>
+        </div>
+      }
+    >
+      <LoginFormContent />
+    </Suspense>
   );
 }

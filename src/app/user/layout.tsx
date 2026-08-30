@@ -2,14 +2,13 @@
 
 import React, { useState } from "react";
 import { useAuthCheck } from "@/hooks/useAuth";
-import { normalizeRole } from "@/lib/auth/route-policy";
-import { SuperAdminNavbar } from "@/components/super-admin/SuperAdminNavbar";
-import { SuperAdminSidebar } from "@/components/super-admin/SuperAdminSidebar";
-import { ShieldAlert, Lock, ArrowLeft } from "lucide-react";
+import { UserNavbar } from "@/components/user/UserNavbar";
+import { UserSidebar } from "@/components/user/UserSidebar";
+import { Lock, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, role, isPending, isAuthenticated } = useAuthCheck();
+export default function UserLayout({ children }: { children: React.ReactNode }) {
+  const { isPending, isAuthenticated } = useAuthCheck();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // 1. Loading State
@@ -18,28 +17,25 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
       <div className="min-h-screen bg-[#FCFAF6] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-3 border-[#B37068] border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-bold text-gray-500">Verifying Super Admin Authorization...</p>
+          <p className="text-xs font-bold text-gray-500">Loading Customer Account...</p>
         </div>
       </div>
     );
   }
 
-  // 2. Access Protection (Must be authenticated & Role must be SUPER_ADMIN)
-  const currentRole = normalizeRole(role || (user as { role?: string })?.role);
-  const isSuperAdmin = currentRole === "SUPER_ADMIN";
-
-  if (!isAuthenticated || !isSuperAdmin) {
+  // 2. Authentication Protection
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#FCFAF6] flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-gray-200/80 shadow-lg text-center space-y-4">
-          <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
             <Lock size={32} />
           </div>
 
-          <h2 className="text-xl font-extrabold text-[#3A322B]">Super Admin Access Restricted</h2>
+          <h2 className="text-xl font-extrabold text-[#3A322B]">Customer Sign In Required</h2>
 
           <p className="text-xs text-gray-500 leading-relaxed">
-            You must be logged in with a <span className="font-bold text-[#B37068]">SUPER_ADMIN</span> privilege to view the platform administration area.
+            Please log in to your <span className="font-bold text-[#B37068]">VOYΛGE</span> account to view your orders, wishlist, shipping addresses, and personal profile.
           </p>
 
           <div className="pt-3 flex flex-col gap-2.5">
@@ -47,7 +43,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
               href="/login"
               className="w-full bg-[#B37068] hover:bg-[#9c6059] text-white py-3 rounded-2xl text-xs font-bold transition-all shadow-xs block text-center"
             >
-              Sign In as Super Admin
+              Sign In to Your Account
             </Link>
 
             <Link
@@ -63,12 +59,12 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     );
   }
 
-  // 3. Authorized Super Admin Layout
+  // 3. Authorized Customer Layout
   return (
     <div className="min-h-screen bg-[#FCFAF6] font-sans antialiased text-[#3A322B]">
-      <SuperAdminNavbar onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)} />
+      <UserNavbar onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)} />
       <div className="flex w-full">
-        <SuperAdminSidebar
+        <UserSidebar
           isMobileOpen={mobileSidebarOpen}
           onCloseMobile={() => setMobileSidebarOpen(false)}
         />

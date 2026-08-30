@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAuthCheck } from "@/hooks/useAuth";
+import { normalizeRole } from "@/lib/auth/route-policy";
 import { AdminNavbar } from "@/components/admin/AdminNavbar";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Lock, ArrowLeft } from "lucide-react";
@@ -24,15 +25,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   // 2. Access Protection (Must be authenticated & Role must be ADMIN or SUPER_ADMIN)
-  const rawRole = (user as any)?.role || role || "";
-  const normalizedRole = rawRole.toString().toUpperCase().replace(/[-_]/g, "");
-
-  const isAdminOrSuperAdmin =
-    !rawRole || // Allow authenticated session fallback
-    normalizedRole === "ADMIN" ||
-    normalizedRole === "SUPERADMIN" ||
-    normalizedRole === "AUTHOR" ||
-    normalizedRole === "USER";
+  const currentRole = normalizeRole(role || (user as { role?: string })?.role);
+  const isAdminOrSuperAdmin = currentRole === "ADMIN" || currentRole === "SUPER_ADMIN";
 
   if (!isAuthenticated || !isAdminOrSuperAdmin) {
     return (

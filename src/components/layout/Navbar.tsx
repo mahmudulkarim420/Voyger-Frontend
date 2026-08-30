@@ -10,6 +10,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAuthCheck, useSignOut } from "@/hooks/useAuth";
 import { fetchApi } from "@/lib/api";
 import { formatPrice } from "@/lib/formatters";
+import { getDashboardRoute } from "@/lib/navigation";
 import { ImageWithFallback as Image } from "@/components/ui/ImageWithFallback";
 
 const categoriesById = new Map(storeCategories.map((category) => [category.id, category]));
@@ -22,7 +23,7 @@ export const Navbar = () => {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount, setIsCartOpen } = useCart();
-  const { user, isPending, isAuthenticated } = useAuthCheck();
+  const { user, isPending, isAuthenticated, role } = useAuthCheck();
   const { signOutNow } = useSignOut("/");
 
   // Close suggestions when clicking outside
@@ -299,7 +300,7 @@ export const Navbar = () => {
                 </Link>
                 <button
                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  onClick={() => router.push("/dashboard")}
+                  onClick={() => router.push(getDashboardRoute(role))}
                 >
                   Dashboard
                 </button>

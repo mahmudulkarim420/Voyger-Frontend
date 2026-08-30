@@ -6,10 +6,15 @@
 export const ACCOUNT_ROUTE_PREFIXES = [
   "/profile",
   "/orders",
-  "/dashboard",
+  "/super-admin",
+  "/admin",
+  "/user",
   "/account",
   "/settings",
 ] as const;
+
+import { getDashboardRoute } from "./auth/route-policy";
+export { getDashboardRoute };
 
 /**
  * Check whether the current pathname belongs to the account section.
@@ -30,5 +35,5 @@ export const quickAccessLinks: QuickAccessItem[] = [
   { name: "Sign In / Sign Up", href: "/login" },
   { name: "Profile", href: "/profile" },
   { name: "Orders", href: "/orders" },
-  { name: "Dashboard", href: "/dashboard" },
 ];
+

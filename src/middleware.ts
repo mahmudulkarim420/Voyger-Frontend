@@ -1,48 +1,60 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { authorizeRoute } from "@/lib/auth/route-policy";
 
 export async function middleware(request: NextRequest) {
-  // Grab the session cookie.
-  // Note: Depending on your domain config, Better Auth names this 'better-auth.session_token'.
+  const pathname = request.nextUrl.pathname;
+  const callbackUrlParam = request.nextUrl.searchParams.get("callbackUrl");
+
+  // Read Better Auth session token cookie
   const sessionToken =
     request.cookies.get("better-auth.session_token") ||
     request.cookies.get("better-auth.session_token.sig");
 
-  const isDeviceLimitPath = request.nextUrl.pathname.startsWith("/device-limit");
+  let isAuthenticated = false;
+  let rawRole: string | undefined = undefined;
+  let requiresDeviceMgmt: boolean | undefined = undefined;
 
-  // If there's no session, bypass (they are either logged out or visiting public routes).
-  if (!sessionToken) {
-    return NextResponse.next();
+  if (sessionToken) {
+    const authUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/api/v1/auth";
+
+    try {
+      const res = await fetch(`${authUrl}/get-session`, {
+        headers: {
+          cookie: request.headers.get("cookie") || "",
+        },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.user) {
+          isAuthenticated = true;
+          rawRole = data.user.role;
+          requiresDeviceMgmt = data.user.requiresDeviceManagement === true;
+        }
+      }
+    } catch {
+      // Fail gracefully on network or unreachable backend
+    }
   }
 
-  // Fetch from the backend API to strictly read the 'requiresDeviceManagement' state.
-  const authUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000/api/v1/auth";
+  // Authoritative route authorization evaluation
+  const authResult = authorizeRoute(
+    pathname,
+    isAuthenticated,
+    rawRole,
+    requiresDeviceMgmt,
+    callbackUrlParam
+  );
 
-  try {
-    const res = await fetch(`${authUrl}/get-session`, {
-      headers: {
-        // Forward the cookie so the backend can identify the session.
-        cookie: request.headers.get("cookie") || "",
-      },
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      const user = data?.user;
-
-      const requiresMgmt = user?.requiresDeviceManagement === true;
-
-      // Enforce redirect logic based on the user's forced state
-      if (requiresMgmt && !isDeviceLimitPath && !request.nextUrl.pathname.startsWith("/login")) {
-        return NextResponse.redirect(new URL("/device-limit", request.url));
-      }
-
-      if (!requiresMgmt && isDeviceLimitPath) {
-        return NextResponse.redirect(new URL("/", request.url));
-      }
+  if (authResult.decision !== "ALLOW" && authResult.targetUrl) {
+    const currentUrl = request.nextUrl.pathname + request.nextUrl.search;
+    
+    // Prevent redirect loops if already at target URL
+    if (currentUrl !== authResult.targetUrl && pathname !== authResult.targetUrl) {
+      const redirectUrl = new URL(authResult.targetUrl, request.url);
+      return NextResponse.redirect(redirectUrl);
     }
-  } catch (error) {
-    // Fail gracefully if backend is unreachable
   }
 
   return NextResponse.next();
@@ -51,8 +63,11 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Run middleware on all paths except static assets & trpc/api routes.
+     * Match all request paths except for:
+     * - api routes (/api/...)
+     * - _next static & image optimization files
+     * - static files (svg, png, jpg, jpeg, gif, webp, ico, css, js, woff, woff2)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff|woff2)$).*)",
   ],
 };
